@@ -180,8 +180,8 @@ The SEO-side defaults (home H1, seasonal date, blog set) are in `SEO.md` §1. Pl
   - **Goal:** clean, whole, continuous single-stroke SVG drawings: elements throughout the pages, inspired by the voucher art, not 1:1 copies.
   - **Steps:**
     - (a) **Inventory:** which drawing goes where:
-      - vouchers hub, 7 (one per group);
-      - simpler set per group page;
+      - **7 new group designs** (one per group page), drawn to match the voucher designs;
+      - the real voucher designs themselves are shown as images (fronts), not redrawn;
       - big background drawings on service pages;
       - home;
       - small scattered elements.
@@ -472,7 +472,7 @@ Order from the brief: Servicii + the 3 main pages → Vouchere + 7 groups → De
 
 - [ ] **E14 · `/vouchere/` hub**
   - **Goal:**
-    - **7 drawings, one per group**;
+    - the **real voucher designs** (fronts from `M/vouchere/`);
     - group cards;
     - promo;
     - how to buy (reception or phone);
@@ -483,8 +483,9 @@ Order from the brief: Servicii + the 3 main pages → Vouchere + 7 groups → De
 - [ ] **E15 · Voucher group template**
   - **Goal:**
     - the group's video clip;
-    - voucher cards: tapping a card reveals services, sessions, duration, price and promo (a `button` with `aria-expanded`, and the details are already in the HTML);
-    - **simpler drawings**;
+    - the group's **new design** (one of the 7, matching the voucher style);
+    - the **real voucher fronts** of the group (images);
+    - separately, per voucher: **price and details**, with each included service listed as a **FAQ-style dropdown** explaining it (`button` + `aria-expanded`, details already in the HTML, slow dropdown tokens);
     - previous/next group.
   - **Done when:** **Show Cata, wait for OK.**
   - **Depends on:** E14, S9 · **Subagent:** no
