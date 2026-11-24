@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A2 · Perechi de fonturi · Ecomed (lab, desktop)</title>
+<!-- Lab only: fonts load from Google here so Cata can compare. The chosen pair ships self-hosted (Fontsource, latin-ext). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Lato:wght@400;700&family=Sora:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;700&family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+:root { font-size: clamp(10px, min(1.1112vw, 1.7778vh), 30px); }
+@media (min-width: 821px) and (max-width: 1720px) and (max-height: 960px) {
+  :root { font-size: clamp(10px, min(1.1112vw, 2vh), 30px); }
+}
+:root {
+  --orange: #FD9E01; --orange-ink: #A85A00; --orange-200: #FFD58A;
+  --navy: #233D63; --navy-deep: #16243D;
+  --sky-50: #F4F8FD; --sky-100: #E8F1FA;
+  --mauve-bg: #EBBFDA;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--sky-50); color: var(--navy); -webkit-font-smoothing: antialiased; }
+
+.pair { position: relative; isolation: isolate; overflow: hidden; min-height: 100vh; min-height: 100dvh;
+  display: grid; grid-template-columns: 1.25fr 1fr; align-items: center; gap: 4rem; padding: 4rem 5rem;
+  background: linear-gradient(180deg, var(--sky-50), var(--sky-100)); }
+.pair::before, .pair::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; filter: blur(5rem); }
+.pair::before { width: 40rem; height: 30rem; left: -12rem; top: -10rem; background: var(--mauve-bg); opacity: .58; }
+.pair::after { width: 40rem; height: 34rem; right: -14rem; bottom: -10rem; background: #A9CBEE; opacity: .85; }
+
+.tag { position: absolute; top: 1.4rem; left: 5rem; display: flex; gap: .6rem; align-items: center;
+  font: 600 .82rem/1 system-ui, sans-serif; color: #fff; }
+.tag b { background: var(--navy-deep); padding: .5rem .8rem; border-radius: 999px; }
+.tag span { background: rgba(22,36,61,.85); padding: .5rem .8rem; border-radius: 999px; font-weight: 500; }
+.tag .ok { background: #1F7A4D; }
+.tag .bad { background: #B3261E; }
+
+.demo { text-align: center; }
+.eyebrow { font-family: var(--h); font-weight: 700; font-size: .8rem; letter-spacing: .16em; text-transform: uppercase; color: var(--navy); }
+h2 { font-family: var(--h); font-weight: var(--hw, 700); font-size: 3.4rem; line-height: 1.1; letter-spacing: var(--ht, -.025em);
+  margin: 1rem auto 1rem; max-width: 40rem; text-wrap: balance; }
+.lead { font-family: var(--b); font-size: 1.15rem; line-height: 1.65; max-width: 36rem; margin: 0 auto; color: rgba(35,61,99,.85); }
+.ctas { display: flex; justify-content: center; gap: .9rem; margin-top: 1.9rem; }
+.btn { display: inline-flex; align-items: center; min-height: 3.3rem; padding: 0 1.6rem; border-radius: 999px;
+  font-family: var(--h); font-weight: 700; font-size: 1rem; text-decoration: none; }
+.btn-o { background: var(--orange); color: var(--navy-deep); box-shadow: 0 .6rem 1.6rem -.6rem rgba(253,158,1,.7); }
+.btn-g { background: rgba(255,255,255,.6); color: var(--navy); border: 1px solid #fff; }
+
+.side { display: grid; gap: 1.1rem; }
+.card { background: linear-gradient(160deg, rgba(255,255,255,.78), rgba(255,255,255,.45)); border: 1px solid #fff; border-radius: 1.5rem;
+  padding: 1.5rem 1.7rem; box-shadow: 0 1.2rem 2.4rem -1.4rem rgba(35,61,99,.35); text-align: center; }
+.card h3 { font-family: var(--h); font-weight: 700; font-size: 1.25rem; margin: 0 0 .5rem; letter-spacing: -.01em; }
+.card p { font-family: var(--b); font-size: 1rem; line-height: 1.65; margin: 0; color: rgba(35,61,99,.85); }
+.navrow { font-family: var(--h); font-weight: 600; font-size: .95rem; display: flex; justify-content: center; gap: 1.6rem; }
+.price { font-family: var(--h); font-weight: 700; font-size: 2.6rem; letter-spacing: -.02em; color: var(--navy-deep); font-variant-numeric: tabular-nums; }
+.price .pill { display: inline-block; background: var(--orange); padding: .35rem 1rem; border-radius: 999px; }
+.price small { font-size: 1rem; font-weight: 600; letter-spacing: 0; margin-left: .3rem; color: var(--navy); }
+.glyphs { font-family: var(--h); font-weight: 700; font-size: 2rem; letter-spacing: .04em; }
+.glyphs + .glyphs { font-family: var(--b); font-weight: 400; font-size: 1.4rem; margin-top: .3rem; }
+
+#p1 { --h: 'Montserrat', sans-serif; --b: 'Lato', sans-serif; }
+#p2 { --h: 'Sora', sans-serif; --b: 'Plus Jakarta Sans', sans-serif; --hw: 600; --ht: -.03em; }
+#p3 { --h: 'Figtree', sans-serif; --b: 'Figtree', sans-serif; --ht: -.02em; }
+#p4 { --h: 'Fraunces', serif; --b: 'Figtree', sans-serif; --hw: 600; --ht: -.015em; }
+/* Fraunces is a serif: keep the small UI bits (buttons, nav, eyebrow, price) in the sans for legibility */
+#p4 .btn, #p4 .navrow, #p4 .eyebrow, #p4 .price { font-family: 'Figtree', sans-serif; }
+</style>
+</head>
+<body>
+
+<template id="tpl">
+  <div class="demo">
+    <span class="eyebrow">Clinica Ecomed · Oradea</span>
+    <h2>Medic de familie și recuperare medicală în Oradea</h2>
+    <p class="lead">Text de probă pentru diacritice și ritm: ă â î ș ț, Ă Â Î Ș Ț. Textul real vine din conținutul aprobat · TODO (ask Cata).</p>
+    <div class="ctas"><a class="btn btn-o" href="#">Programați-vă telefonic</a><a class="btn btn-g" href="#">Vedeți voucherele</a></div>
+  </div>
+  <div class="side">
+    <div class="card"><div class="navrow"><span>Acasă</span><span>Servicii</span><span>Vouchere</span><span>Despre noi</span><span>Contact</span></div></div>
+    <div class="card">
+      <h3>Pachet anticelulitic · abdomen</h3>
+      <p>Drenaj limfatic, terapie Deep Oscillation și terapie Shock Wave, ședințe de 60 de minute.</p>
+      <div class="price" style="margin-top:.9rem"><span class="pill">639</span><small>lei / pachet</small></div>
+    </div>
+    <div class="card"><div class="glyphs">Ș ș Ț ț Ă ă Â â Î î</div><div class="glyphs">Înscrieri, ședințe, țesuturi, întâlniri</div></div>
+  </div>
+</template>
+
+<section class="pair" id="p1" data-h="Montserrat" data-b="Lato">
+  <div class="tag"><b>1 · Montserrat + Lato</b><span>fonturile de pe vouchere și video</span></div>
+</section>
+<section class="pair" id="p2" data-h="Sora" data-b="Plus Jakarta Sans">
+  <div class="tag"><b>2 · Sora + Plus Jakarta Sans</b><span>perechea de pe nestos.ro</span></div>
+</section>
+<section class="pair" id="p3" data-h="Figtree" data-b="Figtree">
+  <div class="tag"><b>3 · Figtree</b><span>o singură familie, curată, medicală</span></div>
+</section>
+<section class="pair" id="p4" data-h="Fraunces" data-b="Figtree">
+  <div class="tag"><b>4 · Fraunces + Figtree</b><span>titluri serif, mai cald și mai elegant</span></div>
+</section>
+
+<script>
+  const tpl = document.getElementById('tpl');
+  document.querySelectorAll('.pair').forEach(s => s.append(tpl.content.cloneNode(true)));
+
+  // Glyph check: if a font really has comma-below ș ț (U+0219/U+021B) and ă â î, the width of the
+  // test string is the same whatever the fallback is. If it falls back, the two widths differ.
+  const test = 'ȘșȚțĂăÂâÎî';
+  const cv = document.createElement('canvas').getContext('2d');
+  const has = (fam, w) => ['monospace', 'serif'].map(fb => { cv.font = `${w} 40px "${fam}", ${fb}`; return cv.measureText(test).width; })
+    .reduce((a, b) => Math.abs(a - b) < .01);
+  // the weights each pair actually uses: heading 600/700, body 400
+  const uses = s => [[s.dataset.h, 600], [s.dataset.h, 700], [s.dataset.b, 400]];
+  const all = [...document.querySelectorAll('.pair')].flatMap(uses);
+  Promise.all(all.map(([f, w]) => document.fonts.load(`${w} 40px "${f}"`, test))).then(() => {
+    document.querySelectorAll('.pair').forEach(s => {
+      const ok = uses(s).every(([f, w]) => has(f, w));
+      const el = document.createElement('span');
+      el.className = ok ? 'ok' : 'bad';
+      const miss = [];
+      if (!ok) uses(s).forEach(([f, w]) => [...test].forEach(ch => {
+        const m = ['monospace', 'serif'].map(fb => { cv.font = `${w} 40px "${f}", ${fb}`; return cv.measureText(ch).width; });
+        if (Math.abs(m[0] - m[1]) >= .01) miss.push(`${f} ${w}: ${ch}`);
+      }));
+      el.textContent = ok ? 'ș ț cu virgulă: OK' : 'lipsesc glife · ' + [...new Set(miss)].join(', ');
+      s.querySelector('.tag').append(el);
+    });
+    const only = new URLSearchParams(location.search).get('only');
+    if (only) document.querySelectorAll('.pair').forEach(s => { if (s.id !== 'p' + only) s.remove(); });
+  });
+</script>
+</body>
+</html>
