@@ -1,0 +1,229 @@
+---
+/**
+ * Section with a ground (light / navy / orange / peach) and soft colour glows behind the content.
+ *
+ * Cata, 24 Nov 2026: the glows must be "more random and different" from section to section, and
+ * move on scroll, so two neighbouring sections on the same colour still feel alive.
+ * - Layout (Cata: "like paint thrown on a canvas, more blended, not circles"): 3–5 organic paint
+ *   shapes (puddles and bent swipes, with droplets, edges wobbled by an SVG noise filter), generated from `seed` at build time (same seed = same layout,
+ *   so the page does not change between builds). Give each section on a page a different seed.
+ * - Colours: weighted per ground. sky-300 and sky-500 come up most (Cata loves both).
+ *   Mauve/pink appears only here, as a glow, never as text.
+ * - Motion: each shape floats slowly by itself (CSS only, no scroll link: Cata found scroll-linked
+ *   drift laggy). Runs only while the section is on screen; off with reduced motion.
+ * - The glow layer fades out near the top and bottom edges, so two neighbouring sections on the
+ *   same ground meet on the flat base colour without a seam.
+ */
+interface Props {
+  ground?: 'light' | 'navy' | 'orange' | 'peach';
+  seed?: number;
+  id?: string;
+  class?: string;
+  /** number of glows; random 3–5 if omitted */
+  glows?: number;
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
+}
+
+const { ground = 'light', seed, id, class: cls, glows, ...aria } = Astro.props;
+
+// module counter only as a fallback; pass an explicit seed for stable layouts
+const g = globalThis as { __ecomedSeed?: number };
+g.__ecomedSeed = (g.__ecomedSeed ?? 0) + 1;
+const s0 = seed ?? g.__ecomedSeed * 7919;
+
+// mulberry32
+let t = (s0 * 2654435761) >>> 0;
+const rnd = () => {
+  t = (t + 0x6d2b79f5) >>> 0;
+  let r = Math.imul(t ^ (t >>> 15), 1 | t);
+  r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+  return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+};
+const between = (a: number, b: number) => a + (b - a) * rnd();
+const sign = () => (rnd() < 0.5 ? -1 : 1);
+
+type Tone = { c: string; o: string; w: number };
+const palettes: Record<string, Tone[]> = {
+  light: [
+    { c: 'var(--color-sky-300)', o: 'var(--glow-sky-light)', w: 3 },
+    { c: 'var(--color-sky-500)', o: 'var(--glow-sky500-light)', w: 3 },
+    { c: 'var(--color-blush)', o: 'var(--glow-blush-light)', w: 2 },
+    { c: 'var(--color-orange-200)', o: 'var(--glow-orange-light)', w: 1 },
+  ],
+  navy: [
+    { c: 'var(--color-sky-500)', o: 'var(--glow-sky-navy)', w: 3 },
+    { c: 'var(--color-sky-300)', o: '0.22', w: 1.2 },
+    { c: 'var(--color-blush-deep)', o: 'var(--glow-blush-navy)', w: 1.8 },
+    { c: 'var(--color-navy-900)', o: '0.9', w: 1.6 },
+  ],
+  orange: [
+    { c: '#FFB534', o: '0.95', w: 2 },
+    { c: 'var(--color-orange-600)', o: '0.9', w: 2 },
+    { c: 'var(--color-orange-200)', o: '0.75', w: 1.4 },
+    { c: 'var(--color-white)', o: '0.3', w: 0.8 },
+    { c: 'var(--color-blush)', o: '0.42', w: 0.9 },
+  ],
+  peach: [
+    { c: 'var(--color-orange-100)', o: '0.95', w: 2 },
+    { c: 'var(--color-sky-300)', o: '0.7', w: 2.2 },
+    { c: 'var(--color-orange-200)', o: '0.6', w: 1.2 },
+    { c: 'var(--color-sky-500)', o: '0.28', w: 1.2 },
+    { c: 'var(--color-blush)', o: '0.55', w: 1.3 },
+  ],
+};
+
+const pal = palettes[ground];
+const pick = () => {
+  let x = rnd() * pal.reduce((a, p) => a + p.w, 0);
+  for (const p of pal) if ((x -= p.w) <= 0) return p;
+  return pal[0];
+};
+
+const n = glows ?? 5 + Math.floor(rnd() * 3);
+const f = (v: number) => v.toFixed(1);
+
+// Organic outline: polar shape with a few low "lobes" (sines) + jitter, smoothed with Catmull-Rom.
+// stroke = long, bent, tapered swipe; pool = irregular puddle; both may throw droplets around.
+function paint(W: number, H: number, kind: 'pool' | 'stroke') {
+  const cx = W / 2, cy = H / 2;
+  const rx = W * (kind === 'stroke' ? 0.42 : 0.34), ry = H * (kind === 'stroke' ? 0.2 : 0.32);
+  const lobes = [2, 3, 5].map((k, i) => ({ k, a: between(0, [0.2, 0.15, 0.08][i]), ph: between(0, 6.283) }));
+  const bend = kind === 'stroke' ? between(-0.9, 0.9) : 0;
+  const taper = kind === 'stroke' ? between(0.25, 0.6) * sign() : 0;
+  const N = 22;
+  const pts = Array.from({ length: N }, (_, i) => {
+    const th = (i / N) * Math.PI * 2;
+    const r = 1 + lobes.reduce((acc, l) => acc + l.a * Math.sin(l.k * th + l.ph), 0) + between(-0.04, 0.04);
+    const u = Math.cos(th);                       // -1 … 1 along the length
+    const x = cx + rx * r * u;
+    const yr = ry * r * (1 - taper * u);           // one end thinner (strokes)
+    const y = cy + yr * Math.sin(th) + bend * ry * (u * u - 0.5);
+    return [x, y];
+  });
+  let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+  for (let i = 0; i < N; i++) {
+    const p0 = pts[(i - 1 + N) % N], p1 = pts[i], p2 = pts[(i + 1) % N], p3 = pts[(i + 2) % N];
+    d += `C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`;
+  }
+  // droplets thrown off the edge
+  const drops = rnd() < 0.65 ? Array.from({ length: 2 + Math.floor(rnd() * 4) }, () => {
+    const th = between(0, 6.283), dist = between(1.08, 1.35);
+    return { x: f(Math.min(W * 0.95, Math.max(W * 0.05, cx + rx * dist * Math.cos(th)))), y: f(Math.min(H * 0.95, Math.max(H * 0.05, cy + ry * dist * Math.sin(th)))), r: f(Math.min(W, H) * between(0.035, 0.09)) };
+  }) : [];
+  return { d, drops };
+}
+
+// 2 wide soft washes underneath, so the paint melts into colour instead of sitting on a flat ground
+const washes = Array.from({ length: 2 }, (_, i) => {
+  const tone = i === 0 ? pal[0] : pick();
+  const w = between(45, 70), h = between(26, 38);
+  return [
+    `--c:${tone.c}`, `--o:calc(${tone.o} * 0.6)`,
+    `left:calc(${f(i === 0 ? between(-5, 35) : between(55, 95))}% - ${f(w / 2)}rem)`,
+    `top:calc(${f(between(25, 75))}% - ${f(h / 2)}rem)`,
+    `width:${f(w)}rem`, `height:${f(h)}rem`, `--rot:${between(-20, 20).toFixed(0)}deg`,
+    `--fx:${f(sign() * between(1, 3))}rem`, `--fy:${f(sign() * between(1, 2.5))}rem`,
+    `--fd:${between(22, 34).toFixed(0)}s`, `--fdel:${(-between(0, 30)).toFixed(0)}s`,
+  ].join(';');
+});
+
+const blobs = Array.from({ length: n }, (_, i) => {
+  // the first glow is always the ground's main sky tone (or the main orange on orange)
+  // and the second is always the pink (Cata, 24 Nov: more pink, it was almost unnoticeable)
+  const blush = pal.find(p => p.c.includes('blush'));
+  const tone = i === 0 ? pal[0] : i === 1 && blush && ground !== 'orange' ? blush : pick();
+  // spread horizontally: each glow gets its own slice of the width, then jitters
+  const slot = (i + rnd() * 0.9) / n;
+  const x = between(-10, 10) + slot * 100;
+  const y = between(15, 85);
+  const kind = rnd() < 0.35 ? 'stroke' : 'pool';
+  // box in rem; the paint fills ~70% of it, the rest is room for droplets and the wobble filter
+  const h = kind === 'stroke' ? between(14, 22) : between(18, 30);
+  const w = h * (kind === 'stroke' ? between(2, 2.8) : between(1.1, 1.7));
+  const W = Math.round(w * 10), H = Math.round(h * 10);   // 1 unit = 0.1rem
+  const shape = paint(W, H, kind);
+  return {
+    W, H, ...shape,
+    fid: `paint-${s0}-${i}`,
+    turb: { freq: between(0.006, 0.012).toFixed(4), seed: Math.floor(rnd() * 999), scale: f(between(28, 60)) },
+    style: [
+      `--c:${tone.c}`, `--o:${tone.o}`,
+      `left:calc(${f(x)}% - ${f(w / 2)}rem)`,
+      `top:calc(${f(y)}% - ${f(h / 2)}rem)`,
+      `width:${f(w)}rem`, `height:${f(h)}rem`,
+      `--rot:${between(-40, 40).toFixed(0)}deg`,
+      // ambient float
+      `--fx:${f(sign() * between(2.5, 6))}rem`,
+      `--fy:${f(sign() * between(2, 4.5))}rem`,
+      `--fs:${(1 + sign() * between(0.04, 0.1)).toFixed(2)}`,
+      `--fd:${between(18, 32).toFixed(0)}s`,
+      `--fdel:${(-between(0, 30)).toFixed(0)}s`,
+    ].join(';'),
+  };
+});
+---
+<section id={id} class:list={['section', `ground-${ground}`, cls]} data-ground={ground} {...aria}>
+  <div class="glows" aria-hidden="true">
+    {washes.map(w => <span class="wash" style={w}></span>)}
+    {blobs.map(b => (
+      <span style={b.style}>
+        <svg viewBox={`0 0 ${b.W} ${b.H}`} preserveAspectRatio="none">
+          <filter id={b.fid} x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency={b.turb.freq} numOctaves="2" seed={b.turb.seed} />
+            <feDisplacementMap in="SourceGraphic" scale={b.turb.scale} xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          <g filter={`url(#${b.fid})`}>
+            <path d={b.d} />
+            {b.drops.map(d => <circle cx={d.x} cy={d.y} r={d.r} />)}
+          </g>
+        </svg>
+      </span>
+    ))}
+  </div>
+  <div class="section-inner"><slot /></div>
+</section>
+
+<style>
+  .section { position: relative; isolation: isolate; overflow: clip; padding: var(--section-y) var(--gutter); }
+  .ground-light { background: var(--ground-light); color: var(--ink); }
+  .ground-navy { background: var(--ground-navy); color: var(--ink-on-dark); }
+  .ground-orange { background: var(--ground-orange); color: var(--color-navy-900); }
+  .ground-peach { background: var(--ground-peach); color: var(--ink); }
+
+  .section-inner { position: relative; z-index: 1; }
+
+  .glows span svg { display: block; width: 100%; height: 100%; overflow: visible; fill: var(--c); }
+  /* on navy, overlapping paint gets lighter (screen) */
+  /* normal on light: multiply turned orange-over-blue into olive */
+  .glows .wash { border-radius: 50%; background: var(--c); filter: blur(var(--glow-blur)); mix-blend-mode: normal; }
+  .ground-navy .glows { --paint-blend: screen; }
+  .glows {
+    position: absolute; isolation: isolate; inset: 0; z-index: 0; pointer-events: none;
+    /* fade near the top and bottom: same-ground neighbours meet on the flat base, no seam */
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 4.5rem, #000 calc(100% - 4.5rem), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 4.5rem, #000 calc(100% - 4.5rem), transparent 100%);
+  }
+  .glows span {
+    position: absolute;
+    opacity: var(--o);
+    filter: blur(var(--paint-blur));
+    mix-blend-mode: var(--paint-blend, normal);
+    rotate: var(--rot);
+    animation: glow-float var(--fd) ease-in-out var(--fdel) infinite alternate;
+    animation-play-state: paused;
+  }
+  /* only sections on screen animate (grounds.ts toggles .is-live) */
+  .section.is-live .glows span { animation-play-state: running; will-change: translate, scale; }
+  @keyframes glow-float {
+    from { translate: 0 0; scale: 1; }
+    to { translate: var(--fx) var(--fy); scale: var(--fs, 1.05); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .glows span { animation: none; }
+  }
+</style>
+
+<script>
+  import '../scripts/grounds';
+</script>

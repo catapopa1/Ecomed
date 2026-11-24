@@ -1,1 +1,21 @@
+@import '@fontsource-variable/rubik';
 @import 'tailwindcss';
+@import './tokens.css';
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--color-sky-50);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-weight: var(--font-weight-semibold); text-wrap: balance; margin: 0; }
+  p { text-wrap: pretty; }
+  :focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; border-radius: 0.4rem; }
+  .ground-navy :focus-visible, .ground-orange :focus-visible { outline-color: var(--color-white); }
+}
