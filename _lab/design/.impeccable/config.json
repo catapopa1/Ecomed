@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "clipped-overflow-container",
+        "value": "*",
+        "files": [
+          "_lab/design/a1-combinat.html"
+        ],
+        "createdAt": "2026-11-24T12:26:28.944Z",
+        "reason": "Claude: sections and orange panels clip decorative blobs and drawings on purpose; no tooltips or menus inside"
+      }
+    ]
+  }
+}

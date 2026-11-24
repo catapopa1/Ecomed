@@ -33,3 +33,6 @@ Thumbs.db
 
 # Legacy stock photos (reference only, not shipped)
 _legacy/images/
+
+# Design-checker cache
+.impeccable/hook.cache.json

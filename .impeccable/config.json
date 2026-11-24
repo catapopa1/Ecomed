@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "clipped-overflow-container",
+        "value": "*",
+        "files": [
+          "_lab/design/a1-teme.html"
+        ],
+        "createdAt": "2026-11-24T12:20:44.677Z",
+        "reason": "Claude: section overflow:hidden is intentional, it crops the decorative blobs and drawings that bleed past the edges; no tooltips or menus live inside"
+      }
+    ]
+  }
+}
