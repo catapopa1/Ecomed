@@ -35,5 +35,5 @@ export function buildDraws(root: ParentNode = document) {
 }
 
 export function killDraws() {
-  made.splice(0).forEach((t) => { t.scrollTrigger?.kill(); t.kill(); });
+  made.splice(0).forEach((t) => t.revert());   // revert, not kill: drop the inline transforms too
 }

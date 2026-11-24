@@ -38,6 +38,6 @@ export function buildDeck(root: ParentNode = document) {
 }
 
 export function killDeck() {
-  made.splice(0).forEach((t) => { t.scrollTrigger?.kill(); t.kill(); });
+  made.splice(0).forEach((t) => t.revert());   // revert, not kill: drop the inline transforms too
   document.querySelectorAll('[data-deck]').forEach((d) => d.classList.remove('deck-on'));
 }

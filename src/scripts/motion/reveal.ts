@@ -50,5 +50,5 @@ export function buildReveals(root: ParentNode = document) {
 }
 
 export function killReveals() {
-  made.splice(0).forEach((m) => m.kill());
+  made.splice(0).forEach((m) => ('revert' in m ? m.revert() : m.kill(true)));   // kill(true) reverts a ScrollTrigger
 }
