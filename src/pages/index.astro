@@ -1,9 +1,14 @@
 ---
-// Placeholder until step D (home page). noindex so a stray preview never gets indexed.
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { SITE_NAME, BUSINESS } from '../consts';
+import '../styles/global.css';
 ---
-<BaseLayout title={SITE_NAME} noindex>
-  <h1>{SITE_NAME}</h1>
-  <p>Site în lucru. Programări: <a href={`tel:${BUSINESS.phone}`}>{BUSINESS.phoneDisplay}</a></p>
-</BaseLayout>
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Astro</title>
+  </head>
+  <body>
+    <h1>Astro</h1>
+  </body>
+</html>
