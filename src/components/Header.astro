@@ -1,0 +1,414 @@
+---
+/**
+ * Site header (C1). Style: the Nimbus "Liquid Glass Navbar" Cata picked (24 Nov): one floating
+ * pill of clear glass; the current page sits in an inner glass "drop" with an iridescent rim,
+ * and on desktop the drop glides to whatever item the pointer is on.
+ *
+ * Menu (SEO.md §6, nestos pattern, order by Cata 24 Nov):
+ * Acasă · Servicii (label → /servicii/, arrow → panel) · Vouchere · Despre noi · Contact · call. Panel: 3 main services, Vouchere,
+ * Toate serviciile (Servicii auxiliare left out for now, Cata 24 Nov).
+ *
+ * Phone (≤ 820px): pill with logo, round call button, menu button → full-screen <dialog>
+ * (native focus trap and Esc), same tree inside, safe areas, page behind does not scroll.
+ * Plain <a href> everywhere, so every link is crawlable.
+ */
+import Icon, { type IconName } from './ui/Icon.astro';
+import Button from './ui/Button.astro';
+import { site } from '../data/site';
+import { TOP, MAIN_SERVICES, AUX_SERVICES, isPage, isUnder } from '../data/nav';
+
+const path = Astro.url.pathname;
+const svcIcons: IconName[] = ['stethoscope', 'movement', 'sparkles'];
+const onServiceDetail = [...MAIN_SERVICES, ...AUX_SERVICES].some((s) => isUnder(path, s.href));
+const current = (href: string, panel?: boolean) =>
+  panel ? isPage(path, href) : href === '/vouchere/' ? isUnder(path, href) : isPage(path, href);
+---
+<a class="skip" href="#main">Sari la conținut</a>
+
+<header class="site-header" data-site-header>
+  <div class="bar liquid">
+    <a class="brand" href="/" aria-label={`${site.name}, Acasă`}>
+      <span class="brand-name">{site.brand}</span>
+      <span class="brand-sub">{site.brandSub}</span>
+    </a>
+
+    <nav class="desk" aria-label="Navigație principală">
+      <ul class="items" data-items>
+        <li class="ind" aria-hidden="true" data-ind></li>
+        {TOP.map((l) => (
+          <li class:list={['item', { 'has-panel': l.panel }]}>
+            <a class="link" href={l.href} aria-current={current(l.href, l.panel) ? 'page' : undefined}
+               data-on={current(l.href, l.panel) || (l.panel && onServiceDetail) ? '' : undefined}><Icon name={l.icon} size="1.15rem" stroke={1.8} />{l.label}</a>
+            {l.panel && (
+              <>
+                <button class="chev" type="button" aria-expanded="false" aria-controls="svc-panel" aria-label="Deschide lista de servicii" data-panel-btn>
+                  <Icon name="chevron-down" size="1.15rem" stroke={2.2} />
+                </button>
+                <div class="panel liquid" id="svc-panel" hidden data-panel>
+                  <p class="eyebrow">Serviciile noastre</p>
+                  <ul class="svc">
+                    {MAIN_SERVICES.map((s, i) => (
+                      <li><a href={s.href} aria-current={isPage(path, s.href) ? 'page' : undefined}>
+                        <span class="ic"><Icon name={svcIcons[i]} size="1.3rem" /></span>{s.label}
+                      </a></li>
+                    ))}
+                    <li><a href="/vouchere/" aria-current={isPage(path, '/vouchere/') ? 'page' : undefined}>
+                      <span class="ic"><Icon name="gift" size="1.3rem" /></span>Vouchere cadou
+                    </a></li>
+                  </ul>
+                  <a class="all" href="/servicii/">Toate serviciile <Icon name="arrow" size="1.05rem" stroke={2} /></a>
+                </div>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="end">
+      <ul class="soc" aria-label="Rețele sociale">
+        {site.socials.map((x) => <li><a class="soc-a" href={x.href} target="_blank" rel="noopener" aria-label={x.name}><Icon name={x.icon} size="1.05rem" stroke={1.9} /></a></li>)}
+      </ul>
+      <Button variant="call" class="call-desk" />
+      <a class="round call-phone liquid" href={site.phoneHref} aria-label={`Sunați: ${site.phone}`}><Icon name="phone" size="1.25rem" stroke={2} /></a>
+      <button class="round menu-btn liquid" type="button" aria-label="Deschide meniul" aria-haspopup="dialog" aria-controls="mmenu" data-menu-open>
+        <Icon name="menu" size="1.35rem" stroke={2} />
+      </button>
+    </div>
+  </div>
+  <slot name="promo" />
+</header>
+
+<dialog class="mmenu" id="mmenu" aria-label="Meniu" data-lenis-prevent data-menu>
+  <div class="m-top">
+    <a class="brand" href="/" aria-label={`${site.name}, Acasă`}>
+      <span class="brand-name">{site.brand}</span><span class="brand-sub">{site.brandSub}</span>
+    </a>
+    <button class="round liquid" type="button" aria-label="Închide meniul" data-menu-close><Icon name="x" size="1.35rem" stroke={2} /></button>
+  </div>
+  <nav aria-label="Navigație principală (telefon)">
+    <ul class="m-list">
+      {TOP.map((l) => (
+        <li>
+          <div class="m-row">
+            <a href={l.href} aria-current={current(l.href, l.panel) ? 'page' : undefined}>{l.label}</a>
+            {l.panel && (
+              <button class="m-chev" type="button" aria-expanded="false" aria-controls="m-svc" aria-label="Arată serviciile" data-m-svc-btn>
+                <Icon name="chevron-down" size="1.4rem" stroke={2.2} />
+              </button>
+            )}
+          </div>
+          {l.panel && (
+            <ul class="m-sub" id="m-svc" hidden>
+              {MAIN_SERVICES.map((s, i) => (
+                <li><a href={s.href} aria-current={isPage(path, s.href) ? 'page' : undefined}><span class="ic"><Icon name={svcIcons[i]} size="1.2rem" /></span>{s.short ?? s.label}</a></li>
+              ))}
+              <li><a href="/vouchere/"><span class="ic"><Icon name="gift" size="1.2rem" /></span>Vouchere cadou</a></li>
+              <li><a class="all" href="/servicii/">Toate serviciile <Icon name="arrow" size="1rem" stroke={2} /></a></li>
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="m-foot">
+    <Button variant="call" size="lg" class="m-call" />
+    <ul class="soc m-soc" aria-label="Rețele sociale">
+      {site.socials.map((x) => <li><a class="soc-a" href={x.href} target="_blank" rel="noopener" aria-label={x.name}><Icon name={x.icon} size="1.25rem" stroke={1.9} /></a></li>)}
+    </ul>
+    <p class="m-hours">{site.hours.map((h) => <span>{h.days}: {h.time}</span>)}</p>
+  </div>
+</dialog>
+
+<script>
+  import { getLenis } from '../scripts/motion/smooth';
+
+  const desk = window.matchMedia('(min-width: 821px)');
+
+  /* ── desktop: the glass drop that glides between items ── */
+  const items = document.querySelector<HTMLElement>('[data-items]');
+  const ind = document.querySelector<HTMLElement>('[data-ind]');
+  if (items && ind) {
+    const home = () => items.querySelector<HTMLElement>('.link[data-on]');
+    const place = (el: HTMLElement | null, instant = false) => {
+      if (!el) { ind.style.opacity = '0'; return; }
+      const r = el.getBoundingClientRect(), p = items.getBoundingClientRect();
+      if (instant) ind.style.transition = 'none';
+      ind.style.opacity = '1';
+      ind.style.setProperty('--x', `${r.left - p.left}px`);
+      ind.style.width = `${r.width}px`;
+      if (instant) { ind.getBoundingClientRect(); ind.style.transition = ''; }
+    };
+    const reset = () => place(home(), false);
+    items.querySelectorAll<HTMLElement>('.link').forEach((a) => {
+      a.addEventListener('pointerenter', () => place(a));
+      a.addEventListener('focus', () => place(a));
+    });
+    items.addEventListener('pointerleave', reset);
+    items.addEventListener('focusout', (e) => { if (!items.contains(e.relatedTarget as Node)) reset(); });
+    const init = () => place(home(), true);
+    document.fonts?.ready.then(init); init();
+    addEventListener('resize', init);
+  }
+
+  /* ── desktop: Servicii panel ── */
+  const btn = document.querySelector<HTMLButtonElement>('[data-panel-btn]');
+  const panel = document.querySelector<HTMLElement>('[data-panel]');
+  const setPanel = (open: boolean) => {
+    if (!btn || !panel) return;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? 'Închide lista de servicii' : 'Deschide lista de servicii');
+    panel.hidden = !open;
+  };
+  btn?.addEventListener('click', () => setPanel(btn.getAttribute('aria-expanded') !== 'true'));
+  btn?.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setPanel(true); panel?.querySelector('a')?.focus(); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && btn?.getAttribute('aria-expanded') === 'true') { setPanel(false); btn.focus(); }
+  });
+  document.addEventListener('pointerdown', (e) => {
+    const li = btn?.closest('li');
+    if (li && !li.contains(e.target as Node)) setPanel(false);
+  });
+  let y0 = scrollY;   // scrolling away closes the panel
+  addEventListener('scroll', () => { if (Math.abs(scrollY - y0) > 80) { setPanel(false); } if (panel?.hidden) y0 = scrollY; }, { passive: true });
+  btn?.addEventListener('click', () => { y0 = scrollY; });
+  panel?.addEventListener('focusout', (e) => {
+    const li = btn?.closest('li');
+    if (li && e.relatedTarget && !li.contains(e.relatedTarget as Node)) setPanel(false);
+  });
+
+  /* expanders: Servicii auxiliare (desktop) and Servicii (phone) */
+  document.querySelectorAll<HTMLButtonElement>('[data-aux-btn], [data-m-svc-btn]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(open));
+      const list = document.getElementById(b.getAttribute('aria-controls')!);
+      if (list) list.hidden = !open;
+    });
+  });
+
+  /* ── the bar follows the ground under it: dark glass over navy ── */
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  if (header) {
+    const under = new Set<HTMLElement>();
+    let io: IntersectionObserver | null = null;
+    const pick = () => {
+      // the last one in the document is on top (deck cards stack in DOM order)
+      const top = [...under].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1)).pop();
+      header.dataset.ground = top?.dataset.ground ?? 'light';
+    };
+    const watch = () => {
+      io?.disconnect(); under.clear();
+      const y = Math.round(header.querySelector('.bar')!.getBoundingClientRect().top + 24);
+      io = new IntersectionObserver((es) => {
+        es.forEach((e) => (e.isIntersecting ? under.add(e.target as HTMLElement) : under.delete(e.target as HTMLElement)));
+        pick();
+      }, { rootMargin: `-${y}px 0px -${innerHeight - y - 1}px 0px` });
+      document.querySelectorAll<HTMLElement>('main [data-ground], footer [data-ground]').forEach((el) => io!.observe(el));
+    };
+    let rt = 0;
+    watch();
+
+    /* the footer is a full screen of its own: the header fades away once the footer reaches the
+       upper third of the screen, and comes back when scrolling up (desktop; phone decided later) */
+    const foot = document.querySelector('.site-footer');
+    if (foot) {
+      let fio: IntersectionObserver | null = null;
+      const watchFoot = () => {
+        fio?.disconnect();
+        fio = new IntersectionObserver(([e]) => {
+          header.classList.toggle('away', e.isIntersecting && desk.matches);
+          if (e.isIntersecting) setPanel(false);
+        }, { rootMargin: `0px 0px -${Math.round(innerHeight * 0.65)}px 0px` });
+        fio.observe(foot);
+      };
+      watchFoot();
+      let rf = 0;
+      addEventListener('resize', () => { clearTimeout(rf); rf = window.setTimeout(watchFoot, 200); });
+    }
+    addEventListener('resize', () => { clearTimeout(rt); rt = window.setTimeout(watch, 200); });
+  }
+
+  /* ── phone menu: <dialog> gives the focus trap and Esc ── */
+  const menu = document.querySelector<HTMLDialogElement>('[data-menu]');
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const lock = (on: boolean) => {
+    document.documentElement.classList.toggle('menu-open', on);
+    const l = getLenis(); if (l) { on ? l.stop() : l.start(); }
+  };
+  openBtn?.addEventListener('click', () => { menu?.showModal(); lock(true); });
+  menu?.querySelector('[data-menu-close]')?.addEventListener('click', () => menu.close());
+  menu?.addEventListener('close', () => { lock(false); openBtn?.focus(); });
+  menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.close()));
+  desk.addEventListener('change', (e) => { if (e.matches && menu?.open) menu.close(); });
+</script>
+
+<style>
+  .skip { position: fixed; left: 1rem; top: 1rem; z-index: 100; padding: 0.7rem 1.1rem; border-radius: var(--radius-sm);
+    background: var(--color-navy-900); color: var(--color-white); font-weight: 500; text-decoration: none; translate: 0 -200%; }
+  .skip:focus-visible { translate: 0 0; }
+
+  .site-header { position: fixed; inset: 0 0 auto; z-index: 60; padding: 1rem 2.5rem 0; pointer-events: none; }
+  .site-header { transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out), visibility 0s linear 0s; }
+  .site-header.away { opacity: 0; transform: translateY(-1.2rem); visibility: hidden; transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out), visibility 0s linear 400ms; }
+  .bar {
+    pointer-events: auto;
+    max-width: 88rem; margin: 0 auto; height: 4.4rem; padding: 0 0.5rem 0 1.7rem; column-gap: 1.5rem;
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+    border-radius: var(--radius-pill);
+    --lg-fill: rgb(255 255 255 / 0.5); --lg-solid: rgb(255 255 255 / 0.94);
+    --lg-shadow: 0 0.9rem 2.4rem -1.2rem rgb(22 36 61 / 0.45);
+    color: var(--color-navy-900);
+  }
+
+  /* over navy: smoky dark glass, white text (like the A4 navy cards) */
+  .bar, .brand-sub, .link, .chev, .round { transition: color 300ms var(--ease-out), background-color 300ms var(--ease-out); }
+  .site-header[data-ground='navy'] .bar { --lg-fill: rgb(255 255 255 / 0.08); --lg-bright: 1.04; --lg-sat: 1.05; --lg-glow: rgb(255 255 255 / 0.14);
+    --lg-shadow: 0 0.9rem 2.4rem -1.2rem rgb(0 0 0 / 0.55); color: var(--color-white); }
+  .site-header[data-ground='navy'] .brand-sub { color: var(--color-sky-300); }
+  .site-header[data-ground='navy'] .link, .site-header[data-ground='navy'] .chev { color: rgb(255 255 255 / 0.82); }
+  .site-header[data-ground='navy'] .link[aria-current='page'], .site-header[data-ground='navy'] .link[data-on] { color: var(--color-white); }
+  .site-header[data-ground='navy'] .ind { background: rgb(255 255 255 / 0.14); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 0.4rem 1rem -0.4rem rgb(0 0 0 / 0.4); }
+  .site-header[data-ground='navy'] .menu-btn { --lg-fill: rgb(255 255 255 / 0.1); color: var(--color-white); }
+
+  .brand { justify-self: start; display: inline-flex; align-items: baseline; gap: 0.5rem; line-height: 1; text-decoration: none; color: inherit; padding: 0.4rem 0; white-space: nowrap; }
+  .brand-name { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+  .brand-sub { font-size: 0.85rem; font-weight: 500; color: var(--color-sky-ink); }
+
+  /* desktop items */
+  .items { position: relative; display: flex; align-items: center; gap: 0.15rem; margin: 0; padding: 0; list-style: none; }
+  .item { position: relative; display: flex; align-items: center; }
+  .link {
+    position: relative; z-index: 1; display: inline-flex; align-items: center; min-height: max(44px, 2.9rem); padding: 0 0.9rem;
+    gap: 0.5rem; border-radius: var(--radius-pill); color: var(--color-navy); text-decoration: none; font-weight: 400; font-size: 1rem;
+    transition: color 200ms var(--ease-out);
+  }
+  .link[aria-current='page'], .link[data-on] { color: var(--color-navy-900); font-weight: 500; }
+  .link :global(.icon) { opacity: 0.85; }
+  .has-panel .link { padding-right: 0.35rem; }
+  .chev {
+    position: relative; z-index: 1; display: grid; place-items: center; width: max(36px, 2.2rem); height: max(44px, 2.9rem);
+    margin-right: 0.3rem; padding: 0; border: 0; background: none; color: var(--color-navy); cursor: pointer; border-radius: var(--radius-pill);
+  }
+  .chev :global(.icon) { transition: transform 250ms var(--ease-out); }
+  .chev[aria-expanded='true'] :global(.icon) { transform: rotate(180deg); }
+
+  /* the glass drop (Nimbus): inner clear glass with an iridescent rim */
+  .ind {
+    position: absolute; left: 0; top: 50%; height: max(44px, 2.9rem); width: 0; opacity: 0; z-index: 0;
+    transform: translate(var(--x, 0), -50%); border-radius: var(--radius-pill); pointer-events: none;
+    background: rgb(255 255 255 / 0.55);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.95), inset 0 -0.5rem 1rem -0.6rem rgb(169 203 238 / 0.55), 0 0.4rem 1rem -0.4rem rgb(22 36 61 / 0.3);
+    transition: transform 420ms var(--ease-out), width 420ms var(--ease-out), opacity 200ms;
+  }
+  .ind::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+    background: conic-gradient(from 200deg, #A9CBEE, #EBBFDA, #FFD58A, #A9CBEE 60%, #5E93D6, #A9CBEE);
+    -webkit-mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  }
+
+  /* Servicii panel: the more opaque glass (long list, must read on any ground) */
+  .panel {
+    position: absolute; top: calc(100% + 1.1rem); left: 50%; translate: -50% 0; width: 25rem; padding: 1.1rem;
+    border-radius: var(--radius-lg); --lg-fill: #FBFDFF; --lg-solid: rgb(255 255 255 / 0.97);
+    --lg-shadow: 0 1.6rem 3rem -1.4rem rgb(22 36 61 / 0.5);
+    animation: drop 260ms var(--ease-out);
+  }
+  .panel[hidden] { display: none; }
+  @keyframes drop { from { opacity: 0; transform: translateY(-0.5rem); } }
+  .eyebrow { margin: 0.2rem 0.7rem 0.6rem; font-size: var(--text-eyebrow); letter-spacing: var(--text-eyebrow--letter-spacing); text-transform: uppercase; font-weight: 700; }
+  .svc, .aux-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
+  .svc a, .aux-list a {
+    display: flex; align-items: center; gap: 0.85rem; min-height: 3.3rem; padding: 0.4rem 0.7rem; border-radius: var(--radius-md);
+    color: var(--color-navy-900); text-decoration: none; font-weight: 500;
+  }
+  .ic { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--color-sky-100); color: var(--color-navy-900); flex: none; }
+  .svc a[aria-current='page'], .aux-list a[aria-current='page'] { background: rgb(253 158 1 / 0.16); }
+  .svc a[aria-current='page'] .ic { background: var(--color-orange); }
+  .aux { margin-top: 0.4rem; border-top: 1px solid rgb(35 61 99 / 0.12); padding-top: 0.4rem; }
+  .aux-btn {
+    display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 2.9rem; padding: 0 0.7rem;
+    border: 0; background: none; border-radius: var(--radius-md); font: inherit; font-weight: 500; color: var(--color-navy-900); cursor: pointer;
+  }
+  .aux-btn :global(.icon) { transition: transform 250ms var(--ease-out); }
+  .aux-btn[aria-expanded='true'] :global(.icon) { transform: rotate(180deg); }
+  .todo { padding: 0.5rem 0.7rem; font-size: var(--text-small); color: var(--color-orange-ink); }
+  .all {
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.5rem; min-height: 2.9rem;
+    border-radius: var(--radius-pill); background: var(--color-navy-900); color: var(--color-white); text-decoration: none; font-weight: 500;
+  }
+
+  .end { justify-self: end; display: flex; align-items: center; gap: 0.5rem; }
+  .soc { display: flex; gap: 0.1rem; margin: 0 0.3rem 0 0; padding: 0 0 0 0.7rem; list-style: none; border-left: 1px solid rgb(35 61 99 / 0.18); }
+  .site-header[data-ground='navy'] .soc { border-left-color: rgb(255 255 255 / 0.2); }
+  .soc-a { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; min-width: 36px; min-height: 36px; border-radius: 50%; color: var(--color-navy); transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out); }
+  .site-header[data-ground='navy'] .soc-a { color: rgb(255 255 255 / 0.82); }
+  .m-soc { justify-content: center; gap: 0.6rem; margin: 0; padding: 0; border: 0; }
+  .m-soc .soc-a { width: 3rem; height: 3rem; min-width: 44px; min-height: 44px; background: rgb(255 255 255 / 0.55); color: var(--color-navy-900); }
+  .round {
+    display: grid; place-items: center; width: 3rem; height: 3rem; min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 50%;
+    color: var(--color-navy-900); cursor: pointer; --lg-fill: rgb(255 255 255 / 0.4); touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+  }
+  .round:active { transform: scale(0.94); }
+  .call-phone { --lg-fill: var(--lg-orange); --lg-shadow: var(--shadow-btn); }
+  .call-phone, .menu-btn { display: none; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .link:hover, .chev:hover { color: var(--color-navy-900); }
+    .soc-a:hover { background: var(--color-orange); color: var(--color-navy-900) !important; }
+    .site-header[data-ground='navy'] .link:hover, .site-header[data-ground='navy'] .chev:hover { color: var(--color-white); }
+    .svc a:hover, .aux-list a:hover, .aux-btn:hover { background: rgb(169 203 238 / 0.35); }
+    .all:hover { background: var(--color-navy); }
+  }
+
+  /* ── phone ── */
+  @media (max-width: 820px) {
+    .site-header { padding: calc(0.6rem + env(safe-area-inset-top, 0px)) var(--gutter) 0; }
+    .bar { height: 3.9rem; padding: 0 0.45rem 0 1.2rem; grid-template-columns: 1fr auto; }
+    .desk, .end :global(.call-desk), .end .soc { display: none; }
+    .call-phone, .menu-btn { display: grid; }
+    .brand-name { font-size: 1.3rem; }
+    .brand-sub { font-size: 0.78rem; }
+  }
+
+  .mmenu {
+    position: fixed; inset: 0; width: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; border: 0;
+    padding: calc(0.6rem + env(safe-area-inset-top, 0px)) calc(var(--gutter) + env(safe-area-inset-right, 0px)) calc(1.2rem + env(safe-area-inset-bottom, 0px)) calc(var(--gutter) + env(safe-area-inset-left, 0px));
+    flex-direction: column; overflow-y: auto; overscroll-behavior: contain;
+    color: var(--color-navy-900);
+    background: linear-gradient(165deg, #E8F1FA 0%, #C9DDF5 45%, #EBD3E3 100%);
+    opacity: 0; transform: translateY(-1rem);
+    transition: opacity 280ms var(--ease-out), transform 280ms var(--ease-out), overlay 280ms allow-discrete, display 280ms allow-discrete;
+  }
+  .mmenu[open] { display: flex; opacity: 1; transform: none; }
+  @starting-style { .mmenu[open] { opacity: 0; transform: translateY(-1rem); } }
+  .mmenu::backdrop { background: rgb(22 36 61 / 0.3); }
+  :global(html.menu-open) { overflow: hidden; }
+
+  .m-top { display: flex; align-items: center; justify-content: space-between; height: 3.9rem; padding: 0 0.45rem 0 1.2rem; }
+  .m-top .round { --lg-fill: rgb(255 255 255 / 0.55); }
+  .m-list { list-style: none; margin: 1.6rem 0 0; padding: 0; display: grid; }
+  .m-list > li { border-bottom: 1px solid rgb(35 61 99 / 0.12); }
+  .m-row { display: flex; align-items: center; justify-content: space-between; }
+  .m-row a { flex: 1; display: flex; align-items: center; min-height: 3.6rem; font-size: 1.55rem; font-weight: 600; letter-spacing: -0.01em; color: inherit; text-decoration: none; }
+  .m-row a[aria-current='page']::after { content: ''; width: 0.5rem; height: 0.5rem; margin-left: 0.6rem; border-radius: 50%; background: var(--color-orange); }
+  .m-chev { display: grid; place-items: center; width: 3rem; height: 3rem; border: 0; border-radius: 50%; background: rgb(255 255 255 / 0.5); color: inherit; touch-action: manipulation; }
+  .m-chev :global(.icon) { transition: transform 250ms var(--ease-out); }
+  .m-chev[aria-expanded='true'] :global(.icon) { transform: rotate(180deg); }
+  .m-sub { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 0.2rem; }
+  .m-sub a { display: flex; align-items: center; gap: 0.8rem; min-height: 3rem; font-size: 1.1rem; font-weight: 500; color: inherit; text-decoration: none; }
+  .m-sub a[aria-current='page'] { color: var(--color-orange-ink); }
+  .m-sub .ic { width: 2.2rem; height: 2.2rem; background: rgb(255 255 255 / 0.6); }
+  .m-sub .all { justify-content: center; margin-top: 0.4rem; color: var(--color-white); }
+  .m-foot { margin-top: auto; padding-top: 2rem; display: grid; gap: 0.9rem; justify-items: center; }
+  .m-foot :global(.m-call) { width: 100%; }
+  .m-hours { margin: 0; display: grid; text-align: center; font-size: var(--text-small); color: var(--color-navy); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ind, .mmenu, .panel { transition: none; animation: none; }
+  }
+</style>

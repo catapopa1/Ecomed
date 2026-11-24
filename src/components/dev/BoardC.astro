@@ -1,0 +1,33 @@
+---
+/** C preview: header + footer on the real shell, header passing over every ground and the deck. */
+import Section from '../Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import Button from '../ui/Button.astro';
+const grounds = [
+  { g: 'navy', t: 'Peste navy' }, { g: 'orange', t: 'Peste portocaliu' }, { g: 'peach', t: 'Peste piersică' },
+] as const;
+---
+<Section ground="light" seed={701} class="tall">
+  <SectionHead eyebrow="C · Header și footer" title="Derulați: header-ul trece peste fiecare fundal" level={1} size="h1">
+    <p>Pe desktop, picătura de sticlă urmează mouse-ul. Săgeata de lângă „Servicii” deschide lista. Pe telefon: butonul de apel și meniul.</p>
+  </SectionHead>
+  <div class="row"><Button variant="call" size="lg" /></div>
+</Section>
+{grounds.map((x, i) => (
+  <Section ground={x.g} seed={702 + i} class="tall">
+    <SectionHead eyebrow={`Fundal ${x.g}`} title={x.t} />
+  </Section>
+))}
+<div data-deck>
+  {['light', 'navy', 'peach'].map((g, i) => (
+    <div class="deck-card" data-from={i ? (i === 1 ? 'right' : 'tl') : undefined}>
+      <Section ground={g as 'light'} seed={720 + i} class="tall">
+        <SectionHead eyebrow={`Pachet de cărți · ${i + 1} / 3`} title="Header-ul rămâne deasupra cărților" />
+      </Section>
+    </div>
+  ))}
+</div>
+<style>
+  .row { display: flex; justify-content: center; margin-top: 2rem; }
+  :global(.tall) { min-height: 100svh; display: grid; align-content: center; }
+</style>

@@ -28,13 +28,13 @@ export interface VoucherGroup {
 }
 
 export const GROUPS: VoucherGroup[] = [
-  { id: 'corp', order: 1, title: 'Pachete pentru corp', hook: 'Simțiți-vă bine în pielea dumneavoastră', slug: '/vouchere-cadou/pachete-corp/', clip: 1 },
-  { id: 'fata', order: 2, title: 'Îngrijire pentru față', hook: 'Un ten odihnit și luminos, fără ace și fără bisturiu', slug: '/vouchere-cadou/ingrijire-fata/', clip: 2 },
-  { id: 'piele', order: 3, title: 'Piele, plăgi și cicatrici', hook: 'Pielea dumneavoastră merită îngrijire atentă', slug: '/vouchere-cadou/piele-plagi-cicatrici/', clip: 3 },
-  { id: 'picioare', order: 4, title: 'Picioare grele sau umflate', hook: 'Pași mai ușori, picioare mai odihnite', slug: '/vouchere-cadou/picioare-grele-umflate/', clip: 4 },
-  { id: 'durere', order: 5, title: 'Durere de călcâi, articulații sau coloană', hook: 'Nu lăsați durerea să vă oprească din mișcare', slug: '/vouchere-cadou/durere-calcai-articulatii-coloana/', clip: 5 },
-  { id: 'recuperare', order: 6, title: 'Recuperare după leziune sau operație', hook: 'Reveniți la activitățile de zi cu zi, pas cu pas', slug: '/vouchere-cadou/recuperare-leziune-operatie/', clip: 6 },
-  { id: 'domiciliu', order: 7, title: 'Fiziokinetoterapie la domiciliu', hook: 'Recuperare în confortul casei dumneavoastră', slug: '/vouchere-cadou/fiziokinetoterapie-domiciliu/', clip: 7 },
+  { id: 'corp', order: 1, title: 'Pachete pentru corp', hook: 'Simțiți-vă bine în pielea dumneavoastră', slug: '/vouchere/pachete-corp/', clip: 1 },
+  { id: 'fata', order: 2, title: 'Îngrijire pentru față', hook: 'Un ten odihnit și luminos, fără ace și fără bisturiu', slug: '/vouchere/ingrijire-fata/', clip: 2 },
+  { id: 'piele', order: 3, title: 'Piele, plăgi și cicatrici', hook: 'Pielea dumneavoastră merită îngrijire atentă', slug: '/vouchere/piele-plagi-cicatrici/', clip: 3 },
+  { id: 'picioare', order: 4, title: 'Picioare grele sau umflate', hook: 'Pași mai ușori, picioare mai odihnite', slug: '/vouchere/picioare-grele-umflate/', clip: 4 },
+  { id: 'durere', order: 5, title: 'Durere de călcâi, articulații sau coloană', hook: 'Nu lăsați durerea să vă oprească din mișcare', slug: '/vouchere/durere-calcai-articulatii-coloana/', clip: 5 },
+  { id: 'recuperare', order: 6, title: 'Recuperare după leziune sau operație', hook: 'Reveniți la activitățile de zi cu zi, pas cu pas', slug: '/vouchere/recuperare-leziune-operatie/', clip: 6 },
+  { id: 'domiciliu', order: 7, title: 'Fiziokinetoterapie la domiciliu', hook: 'Recuperare în confortul casei dumneavoastră', slug: '/vouchere/fiziokinetoterapie-domiciliu/', clip: 7 },
 ];
 
 /** A line of the "Pachetul include" / "Ședința include" block. `sessions` only where the voucher prints a count. */

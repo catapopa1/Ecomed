@@ -1,0 +1,112 @@
+---
+/**
+ * A5 lab: the motion language, to choose from.
+ * Switches (top bar) reload with URL params read by the motion engine: ?smooth=0, ?exit=0, ?enter=0.7|1|1.4.
+ * Card contents come from src/data/vouchers.ts; nothing is invented.
+ */
+import Section from '../Section.astro';
+import Glass from '../ui/Glass.astro';
+import Price from '../ui/Price.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import IconDisc from '../ui/IconDisc.astro';
+import { VOUCHERS, GROUPS } from '../../data/vouchers';
+import d15 from '../../assets/drawings/lab-15.svg?raw';
+import d41 from '../../assets/drawings/lab-4.1.svg?raw';
+
+const picks = VOUCHERS.filter(v => v.price).slice(0, 3);
+const styles = [
+  { key: 'up', name: 'A · Ridicare', note: 'Conținutul urcă ușor și apare. Clasic, calm.', ground: 'light', seed: 401 },
+  { key: 'blur', name: 'B · Din ceață', note: 'Apare din blur, aproape pe loc. Moale, „premium”.', ground: 'navy', seed: 402 },
+  { key: 'zoom', name: 'C · Apropiere', note: 'Crește din 92% la 100%. Simte-se ca o carte care vine spre dumneavoastră.', ground: 'peach', seed: 403 },
+  { key: 'curtain', name: 'D · Cortină', note: 'Fiecare card se descoperă de sus în jos.', ground: 'light', seed: 404 },
+] as const;
+const deck = [
+  { from: '', ground: 'orange', seed: 501, label: 'Prima carte' },
+  { from: 'right', ground: 'light', seed: 502, label: 'vine din dreapta' },
+  { from: 'tl', ground: 'navy', seed: 503, label: 'vine din stânga-sus, rotită' },
+  { from: 'br', ground: 'peach', seed: 504, label: 'vine din dreapta-jos, rotită' },
+  { from: '', ground: 'light', seed: 505, label: 'vine de jos, dreaptă' },
+] as const;
+---
+<nav class="lab liquid" aria-label="Comutatoare A5">
+  <b>A5</b>
+  <span>Scroll lin <a href="?smooth=1">da</a><a href="?smooth=0">nu</a></span>
+  <span>Ieșire <a href="?exit=1">da</a><a href="?exit=0">nu</a></span>
+  <span>Viteză intrare <a href="?enter=0.7">rapid</a><a href="?enter=1">mediu</a><a href="?enter=1.4">lent</a></span>
+</nav>
+
+<Section ground="light" seed={400}>
+  <SectionHead eyebrow="A5 · Mișcare" title="Alegeți stilul de intrare, cărțile și desenele" level={1} size="h1">
+    <p>Derulați încet. Patru stiluri de intrare (A–D), apoi pachetul de cărți, apoi desenele trasate de scroll. Urcați înapoi: totul se derulează invers.</p>
+  </SectionHead>
+</Section>
+
+{styles.map(s => (
+  <Section ground={s.ground} seed={s.seed} data-exit>
+    <div data-reveal={s.key}>
+      <div data-mark><SectionHead eyebrow={s.name} title={GROUPS[0].title}><p>{s.note}</p></SectionHead></div>
+      <div class="cards">
+        {picks.map(v => (
+          <div data-mark>
+            <Glass variant={s.ground === 'navy' ? 'dark' : 'liquid'} class="card">
+              <IconDisc name="gift" />
+              <h3>{v.cardTitle}</h3>
+              <Price amount={v.price!} unit={`lei / ${v.priceUnit}`} on={s.ground === 'navy' ? 'dark' : 'light'} />
+            </Glass>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Section>
+))}
+
+<div data-deck>
+  {deck.map((c, i) => (
+    <div class="deck-card" data-from={c.from || undefined}>
+      <Section ground={c.ground} seed={c.seed} class="deck-sec">
+        <SectionHead eyebrow={`Pachet · ${i + 1} / ${deck.length}`} title={GROUPS[i % GROUPS.length].title}>
+          <p>Cartea {i + 1}: {c.label}. Cartea de dedesubt se lasă în spate, se înclină și se întunecă.</p>
+        </SectionHead>
+      </Section>
+    </div>
+  ))}
+</div>
+
+<Section ground="light" seed={601}>
+  <SectionHead eyebrow="Desene" title="Trasate de scroll, șterse la urcare">
+    <p>Stânga: întregul desen pe 1,2 ecrane. Dreapta: pe 2,4 ecrane (mai lent, mai lin). Desenele finale vor fi refăcute (nu copii ale voucherelor).</p>
+  </SectionHead>
+  <div class="draws">
+    <figure><div data-draw data-draw-span="1.2" set:html={d15} /><figcaption>Rapid · 1,2 ecrane</figcaption></figure>
+    <figure><div data-draw data-draw-span="2.4" set:html={d41} /><figcaption>Lent · 2,4 ecrane</figcaption></figure>
+  </div>
+</Section>
+
+<Section ground="navy" seed={602}>
+  <SectionHead eyebrow="Sfârșit" title="Ați ajuns la capăt">
+    <p>Urcați înapoi ca să vedeți desenele ștergându-se și cărțile retrăgându-se.</p>
+  </SectionHead>
+</Section>
+
+<script>
+  import '../../scripts/motion/index';
+</script>
+
+<style>
+  .lab { position: fixed; z-index: 50; top: 1rem; left: 50%; translate: -50% 0; display: flex; gap: 1.4rem; align-items: center;
+    padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); font-size: var(--text-small); color: var(--color-navy-900);
+    --lg-fill: rgb(255 255 255 / 0.55); }
+  .lab span { display: inline-flex; gap: 0.4rem; align-items: center; }
+  .lab a { padding: 0.15rem 0.6rem; border-radius: var(--radius-pill); background: rgb(255 255 255 / 0.6); color: inherit; text-decoration: none; font-weight: 500; }
+  .lab a:hover { background: var(--color-orange); }
+
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: var(--container-page); margin: 3.5rem auto 0; }
+  .cards :global(.card) { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.9rem; height: 100%; }
+  .cards h3 { font-size: var(--text-h3); line-height: var(--text-h3--line-height); }
+
+  .deck-card :global(.deck-sec) { min-height: 100vh; min-height: 100svh; display: grid; align-content: center; }
+
+  .draws { display: grid; grid-template-columns: repeat(2, 22rem); justify-content: center; gap: 4rem; margin-top: 3rem; }
+  .draws figure { margin: 0; text-align: center; }
+  .draws figcaption { margin-top: 1rem; font-size: var(--text-small); color: var(--ctx-muted); }
+</style>

@@ -35,7 +35,7 @@ const names = Object.keys(icons) as IconName[];
       <p class="label">Liquid glass</p>
       <IconDisc name="heart-pulse" />
       <h3>{v1.cardTitle}</h3>
-      <ul class="list">{v1.services.map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}{s.sessions && <span> · {s.sessions} ședințe</span>}</li>)}</ul>
+      <ul class="list">{(v1.services ?? []).map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}{s.sessions && <span> · {s.sessions} ședințe</span>}</li>)}</ul>
       <p class="meta"><Icon name="clock" size="1.05rem" />Ședințe de {v1.durationMin} de minute</p>
       <Price amount={v1.price!} unit={`lei / ${v1.priceUnit}`} />
     </Glass>
@@ -43,7 +43,7 @@ const names = Object.keys(icons) as IconName[];
       <p class="label">Liquid glass · preț redus</p>
       <IconDisc name="gift" />
       <h3>{v41.cardTitle}</h3>
-      <ul class="list">{v41.services.map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}</li>)}</ul>
+      <ul class="list">{(v41.services ?? []).map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}</li>)}</ul>
       <p class="meta"><Icon name="clock" size="1.05rem" />{v41.durationMin} de minute</p>
       <Price amount={v41.promo?.type === 'discount' ? v41.promo.price : v41.price!} old={v41.price!} unit={`lei / ${v41.priceUnit}`} />
     </Glass>
@@ -74,14 +74,14 @@ const names = Object.keys(icons) as IconName[];
       <p class="label">Dark glass</p>
       <IconDisc name="heart-pulse" />
       <h3>{v1.cardTitle}</h3>
-      <ul class="list">{v1.services.map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}{s.sessions && <span> · {s.sessions} ședințe</span>}</li>)}</ul>
+      <ul class="list">{(v1.services ?? []).map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}{s.sessions && <span> · {s.sessions} ședințe</span>}</li>)}</ul>
       <Price amount={v1.price!} unit={`lei / ${v1.priceUnit}`} on="dark" />
     </Glass>
     <Glass variant="dark" class="card">
       <p class="label">Dark glass · preț redus</p>
       <IconDisc name="gift" />
       <h3>{v41.cardTitle}</h3>
-      <ul class="list">{v41.services.map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}</li>)}</ul>
+      <ul class="list">{(v41.services ?? []).map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}</li>)}</ul>
       <Price amount={v41.promo?.type === 'discount' ? v41.promo.price : v41.price!} old={v41.price!} unit={`lei / ${v41.priceUnit}`} on="dark" />
     </Glass>
   </div>

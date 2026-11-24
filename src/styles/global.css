@@ -1,6 +1,7 @@
 @import '@fontsource-variable/rubik';
 @import 'tailwindcss';
 @import './tokens.css';
+@import './motion.css';
 
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }

@@ -1,29 +1,34 @@
 ---
 /**
- * Dev-only design boards: /dev/a3/, /dev/a4/ (A6 design-system page later).
+ * Dev-only design boards: /dev/a3/, /dev/a4/, /dev/a5/ (A6 design-system page later).
  * getStaticPaths returns nothing in production, so no /dev/ page is ever emitted to dist/.
  */
 import '../../styles/global.css';
 import BoardA3 from '../../components/dev/BoardA3.astro';
 import BoardA4 from '../../components/dev/BoardA4.astro';
+import BoardA5 from '../../components/dev/BoardA5.astro';
+import BoardC from '../../components/dev/BoardC.astro';
+import Base from '../../layouts/Base.astro';
 import GlassDefs from '../../components/ui/GlassDefs.astro';
 
 export function getStaticPaths() {
-  return import.meta.env.DEV ? ['a3', 'a4'].map(board => ({ params: { board } })) : [];
+  return import.meta.env.DEV ? ['a3', 'a4', 'a5', 'c'].map(board => ({ params: { board } })) : [];
 }
 const { board } = Astro.params;
 ---
-<!doctype html>
+{board === 'c' ? <Base title="C · Ecomed (dev)" noindex><BoardC /></Base> : (
 <html lang="ro">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
-  <title>{board.toUpperCase()} · Ecomed (dev)</title>
+  <title>{`${board.toUpperCase()} · Ecomed (dev)`}</title>
 </head>
 <body>
   <GlassDefs />
   {board === 'a3' && <BoardA3 />}
   {board === 'a4' && <BoardA4 />}
+  {board === 'a5' && <BoardA5 />}
 </body>
 </html>
+)}
