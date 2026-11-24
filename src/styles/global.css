@@ -1,0 +1,22 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens come in step A (design system), chosen by Cata.
+ * Until then this file only carries the global switches every page needs.
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Environment / secrets (contact.config.php holds SMTP credentials, never commit it)
+.env
+.env.*
+!.env.example
+public/contact.config.php
+
+# Raw media stays outside the repo (materials live in ~/Documents/Promovare_Ecomed); only optimised web versions go in
+*.mov
+*.MOV
+*.psd
+*.ai
+/raw/
+
+# Logs and caches
+*.log
+npm-debug.log*
+.cache/
+*.tsbuildinfo
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Legacy stock photos (reference only, not shipped)
+_legacy/images/
