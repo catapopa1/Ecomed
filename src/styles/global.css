@@ -19,3 +19,81 @@
   :focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; border-radius: 0.4rem; }
   .ground-navy :focus-visible, .ground-orange :focus-visible { outline-color: var(--color-white); }
 }
+
+/* ── Ground context (A4) ─────────────────────────────────────────────
+   UI components read these, so a button, icon or heading adapts to the section it sits in
+   without knowing about it. Section.astro adds .ground-*. */
+@layer base {
+  :root, .ground-light, .ground-peach {
+    --ctx-eyebrow: var(--color-navy-900);        /* grounds are vivid now: ≥ 7:1 on every gradient colour */
+    --ctx-muted: var(--color-navy);              /* ≥ 5.1:1 */
+    /* buttons are liquid glass tinted with their colour (Cata, 24 Nov) */
+    --ctx-call-bg: var(--lg-orange);   --ctx-call-ink: var(--color-navy-900);
+    --ctx-primary-bg: var(--lg-navy);  --ctx-primary-ink: var(--color-white);
+    --ctx-secondary-bg: var(--lg-white); --ctx-secondary-ink: var(--color-navy);
+    --ctx-glass-bg: var(--lg-white);
+    /* icons, style A: navy line on a sky-300 disc */
+    --ctx-icon-disc: var(--lg-white); --ctx-icon-ink: var(--color-navy-900);
+  }
+  .ground-peach {
+    /* icons, style B: orange line on a white disc (like the voucher drawings) */
+    --ctx-icon-disc: var(--lg-white); --ctx-icon-ink: var(--color-orange-ink);   /* orange line, darker so it shows on glass */
+  }
+  .ground-navy {
+    --ctx-eyebrow: var(--color-sky-300);          /* 6.6:1 on navy */
+    --ctx-muted: var(--ink-on-dark-soft);
+    --ctx-primary-bg: var(--lg-white-strong); --ctx-primary-ink: var(--color-navy-900);
+    --ctx-secondary-bg: var(--lg-dark);   --ctx-secondary-ink: var(--color-white);
+    --ctx-glass-bg: var(--lg-dark);       --ctx-glass-rim: rgb(255 255 255 / 0.5);
+    --lg-bright: 1.04; --lg-sat: 1.05; --lg-glow: rgb(255 255 255 / 0.14);   /* smoky glass on navy, not milky or violet */
+    --ctx-card-shadow: 0 14px 36px -16px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.12); --ctx-glass-solid: var(--color-navy-700);
+    /* icons, style C: sky line, no disc */
+    --ctx-icon-disc: transparent; --ctx-icon-ink: var(--color-sky-300);  /* sky-500 was too faint on navy glass; no disc on navy */
+  }
+  .ground-orange {
+    --ctx-eyebrow: var(--color-navy-900);
+    --ctx-muted: var(--color-navy-900);
+    --ctx-call-bg: rgb(22 36 61 / 0.86); --ctx-call-ink: var(--color-white);   /* see-through navy over orange turned brown */
+    --ctx-primary-bg: var(--lg-white-strong); --ctx-primary-ink: var(--color-navy-900);
+    --ctx-secondary-bg: var(--lg-white-soft); --ctx-secondary-ink: var(--color-navy-900);
+    /* icons, style B */
+    --ctx-icon-disc: var(--lg-white); --ctx-icon-ink: var(--color-navy-900);
+  }
+}
+
+/* ── Liquid glass (A4) ───────────────────────────────────────────────
+   Recipe from the 21st.dev "Liquid Glass Navbar" (Nimbus UI, MIT) that Cata picked on 24 Nov 2026:
+   a light tint, a short blur that also lifts saturation and brightness, a thin bright rim made of
+   inset shadows, and a soft navy drop shadow. Flat: no gradient inside (Cata: cards "very minimal").
+   Chrome also bends what is behind the glass (SVG displacement via backdrop-filter: url()); the
+   filter lives in GlassDefs.astro and is switched on by html[data-refract].
+   Use: class="liquid" and set --lg-fill (and optionally --lg-rim, --lg-shadow). */
+@layer components {
+  .liquid {
+    position: relative; isolation: isolate;
+    background: var(--lg-fill, var(--lg-white));
+    -webkit-backdrop-filter: blur(10px) saturate(1.2) brightness(1.08);
+    backdrop-filter: blur(12px) saturate(var(--lg-sat, 1.5)) brightness(var(--lg-bright, 1.14));
+    /* what makes clear glass visible on a smooth gradient: the backdrop is lifted (brighter, more
+       saturated), a sharp light line on the top edge, a faint edge all round, light pooling
+       inside the top, and a soft shadow underneath */
+    box-shadow:
+      inset 0 1px 0 var(--lg-rim, rgb(255 255 255 / 0.95)),
+      inset 1px 0 0 rgb(255 255 255 / 0.3),
+      inset 0 -1px 0 rgb(255 255 255 / 0.18),
+      inset 0 0 0 1px var(--lg-edge, rgb(255 255 255 / 0.5)),
+      inset 0 1.4rem 2.2rem -1.6rem var(--lg-glow, rgb(255 255 255 / 0.55)),
+      var(--lg-shadow, 0 14px 34px -14px rgb(22 36 61 / 0.42), 0 2px 6px rgb(22 36 61 / 0.08));
+    border: 0;
+  }
+  html[data-refract] .liquid.refract {
+    -webkit-backdrop-filter: url(#lg-refract) blur(4px) saturate(var(--lg-sat, 1.5)) brightness(var(--lg-bright, 1.14));
+    backdrop-filter: url(#lg-refract) blur(4px) saturate(var(--lg-sat, 1.5)) brightness(var(--lg-bright, 1.14));
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .liquid { background: var(--lg-solid, var(--color-white)); }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .liquid { background: var(--lg-solid, var(--color-white)); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  }
+}

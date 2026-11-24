@@ -1,0 +1,19 @@
+---
+/**
+ * Icon in the style of its ground (Cata, 24 Nov: all 3 styles, by background):
+ * light → navy line on a liquid-glass disc · peach → orange line on a glass disc ·
+ * orange → navy line on a glass disc · navy → sky-300 line, no disc. Colours from global.css.
+ */
+import Icon, { type IconName } from './Icon.astro';
+interface Props { name: IconName; size?: 'md' | 'lg'; class?: string }
+const { name, size = 'md', class: cls } = Astro.props;
+---
+<span class:list={['disc', 'liquid', `disc-${size}`, cls]}><Icon name={name} size={size === 'lg' ? '1.7rem' : '1.3rem'} /></span>
+<style>
+  .disc { display: inline-grid; place-items: center; border-radius: 50%; color: var(--ctx-icon-ink); flex: none;
+    --lg-fill: var(--ctx-icon-disc); --lg-glow: rgb(255 255 255 / 0.5); --lg-shadow: 0 0.5rem 1rem -0.5rem rgb(22 36 61 / 0.4); }
+  /* navy grounds: no disc (style C), so no glass either */
+  :global(.ground-navy) .disc { background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .disc-md { width: 2.8rem; height: 2.8rem; }
+  .disc-lg { width: 3.8rem; height: 3.8rem; }
+</style>

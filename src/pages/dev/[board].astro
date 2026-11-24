@@ -1,28 +1,17 @@
 ---
 /**
- * Dev-only design boards (A3 tokens now, A6 design-system page later).
+ * Dev-only design boards: /dev/a3/, /dev/a4/ (A6 design-system page later).
  * getStaticPaths returns nothing in production, so no /dev/ page is ever emitted to dist/.
  */
 import '../../styles/global.css';
-import Section from '../../components/Section.astro';
+import BoardA3 from '../../components/dev/BoardA3.astro';
+import BoardA4 from '../../components/dev/BoardA4.astro';
+import GlassDefs from '../../components/ui/GlassDefs.astro';
 
 export function getStaticPaths() {
-  return import.meta.env.DEV ? [{ params: { board: 'a3' } }] : [];
+  return import.meta.env.DEV ? ['a3', 'a4'].map(board => ({ params: { board } })) : [];
 }
-
-const colours = [
-  { group: 'Portocaliu', items: [
-    ['orange', '#FD9E01', 'butoane, prețuri, accente'], ['orange-600', '#F28C00', 'hover'], ['orange-ink', '#A85A00', 'text portocaliu pe deschis'],
-    ['orange-200', '#FFD58A', ''], ['orange-100', '#FFEBC7', ''], ['orange-50', '#FFF5E3', ''] ] },
-  { group: 'Navy', items: [ ['navy', '#233D63', 'text'], ['navy-900', '#16243D', 'fundal închis'], ['navy-700', '#2A4774', 'lumina fundalului navy'] ] },
-  { group: 'Albastru deschis', items: [ ['sky-50', '#F4F8FD', 'pagina'], ['sky-100', '#E8F1FA', ''], ['sky-200', '#D3E5F7', ''], ['sky-300', '#A9CBEE', 'pată difuză, fundaluri moi'], ['sky-500', '#5E93D6', 'pete, iconițe, linii; text pe navy închis'], ['sky-ink', '#3A70B8', 'text albastru mic pe deschis'] ] },
-  { group: 'Roz-mauve (doar în gradiente de fundal)', items: [ ['blush', '#EBBFDA', 'pe deschis'], ['blush-deep', '#B07AA6', 'pe navy'] ] },
-];
-const type = [
-  ['display', 'Medic de familie în Oradea', 600], ['h1', 'Titlu de pagină', 600], ['h2', 'Titlu de secțiune', 600], ['h3', 'Titlu de card', 600],
-  ['h4', 'Subtitlu', 600], ['lead', 'Text de deschidere, mai mare decât corpul.', 400], ['body', 'Text de corp: ședințe, țesuturi, înscrieri. ă â î ș ț', 400],
-  ['small', 'Text mic: detalii, note', 400], ['eyebrow', 'Etichetă de secțiune', 700],
-];
+const { board } = Astro.params;
 ---
 <!doctype html>
 <html lang="ro">
@@ -30,90 +19,11 @@ const type = [
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
-  <title>A3 · Tokens · Ecomed (dev)</title>
-  <style>
-    .board { padding: 3rem var(--gutter) 5rem; }
-    .h { font-size: var(--text-eyebrow); letter-spacing: var(--text-eyebrow--letter-spacing); font-weight: 700; text-transform: uppercase; margin: 3rem 0 1.2rem; }
-    .h:first-child { margin-top: 0; }
-    .sw { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; }
-    .sw div { border-radius: var(--radius-md); overflow: hidden; background: #fff; box-shadow: var(--shadow-card); font-size: var(--text-small); }
-    .sw i { display: block; height: 4.5rem; }
-    .sw p { margin: 0; padding: .6rem .8rem .7rem; line-height: 1.35; }
-    .sw b { font-weight: 600; display: block; }
-    .grp { font-weight: 600; margin: 1.4rem 0 .6rem; }
-    .type { display: grid; gap: .9rem; }
-    .type div { display: grid; grid-template-columns: 9rem 1fr; align-items: baseline; gap: 1.5rem; }
-    .type code { font-size: var(--text-small); color: var(--ink-soft); }
-    .ui { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; align-items: center; }
-    .ui > div { height: 6rem; display: grid; place-items: center; background: var(--glass-light-bg); border: 1px solid var(--glass-light-border); font-size: var(--text-small); box-shadow: var(--shadow-card); }
-
-    .seq .section { min-height: 38rem; display: grid; align-items: center; }
-    .demo { max-width: 40rem; margin: 0 auto; text-align: center; }
-    .demo h2 { font-size: var(--text-h2); line-height: var(--text-h2--line-height); letter-spacing: var(--text-h2--letter-spacing); margin: .8rem 0 1rem; }
-    .demo p { font-size: var(--text-lead); line-height: var(--text-lead--line-height); margin: 0; }
-    .eb { font-size: var(--text-eyebrow); letter-spacing: var(--text-eyebrow--letter-spacing); text-transform: uppercase; font-weight: 700; }
-    .eb.sky { color: var(--color-sky-ink); } .eb.sky-d { color: var(--color-sky-300); } .eb.navy { color: var(--color-navy-900); }
-    .chips { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
-    .chip { display: inline-flex; align-items: center; gap: .7rem; padding: .6rem 1.1rem .6rem .6rem; border-radius: var(--radius-pill); background: var(--glass-light-bg); border: 1px solid var(--glass-light-border); box-shadow: var(--shadow-card); font-weight: 500; }
-    .chip i { width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--color-sky-300); }
-    .chip.c2 i { background: transparent; border: 2px solid var(--color-sky-500); }
-
-    /* price options */
-    .prices { display: grid; grid-template-columns: repeat(2, 20rem); gap: 1rem; }
-    .pc { border-radius: var(--radius-lg); padding: 1.6rem 1.4rem; text-align: center; background: var(--glass-light-bg); border: 1px solid var(--glass-light-border); box-shadow: var(--shadow-card); }
-    .pc h4 { font-size: var(--text-h4); margin-bottom: .2rem; }
-    .pc .n { font-size: var(--text-small); color: var(--ink-soft); margin: 0 0 1rem; }
-    .pc .t { font-size: var(--text-small); margin-top: 1rem; color: var(--ink-soft); }
-    .pc .t b { color: var(--ink); }
-    .price { font-size: var(--text-price); line-height: 1; letter-spacing: var(--text-price--letter-spacing); font-weight: 700; font-variant-numeric: tabular-nums; }
-    .price small { font-size: var(--text-small); font-weight: 500; letter-spacing: 0; }
-    .p2 .price { display: inline-flex; align-items: baseline; gap: .35rem; background: var(--color-orange); color: var(--color-navy-900); padding: .5rem 1rem; border-radius: var(--radius-pill); }
-    .p4 { background: var(--color-navy-900); border-color: var(--glass-dark-border); color: #fff; }
-    .p4 .n, .p4 .t { color: var(--ink-on-dark-soft); } .p4 .t b { color: #fff; }
-    .p4 .price { color: var(--color-orange); }
-    .label { font-size: var(--text-eyebrow); letter-spacing: var(--text-eyebrow--letter-spacing); text-transform: uppercase; font-weight: 700; margin-bottom: .8rem; display: block; }
-  </style>
+  <title>{board.toUpperCase()} · Ecomed (dev)</title>
 </head>
 <body>
-<main class="board">
-  <p class="h">A3 · Prețul · ales: varianta 2</p>
-  <div class="prices">
-    <div class="pc p2"><span class="label">Pe deschis</span><h4>Anticelulitic · abdomen</h4><p class="n">3 terapii, ședințe de 60 de minute</p><div class="price">639 <small>lei / pachet</small></div><p class="t"><b>Pastilă portocalie, text navy</b> · 7,4:1</p></div>
-    <div class="pc p4"><span class="label">Pe navy</span><h4>Anticelulitic · abdomen</h4><p class="n">3 terapii, ședințe de 60 de minute</p><div class="price">639 <small>lei / pachet</small></div><p class="t"><b>Portocaliu de brand direct</b> · 5,3:1</p></div>
-  </div>
-</main>
-
-<!-- ground sequence: each section has its own random glow layout and drifts on scroll -->
-<div class="seq">
-  <Section ground="light" seed={11}><div class="demo"><span class="eb sky">1 · Deschis</span><h2>Pete diferite în fiecare secțiune</h2><p>Petele de culoare plutesc singure, foarte lent.</p></div></Section>
-  <Section ground="light" seed={23}><div class="demo"><span class="eb sky">2 · Deschis, aceeași culoare</span><h2>Fără linie între secțiuni</h2><p>Două secțiuni deschise la rând se unesc pe culoarea de bază; petele se mișcă singure, încet.</p>
-    <div class="chips"><span class="chip"><i></i>Iconiță pe sky-300</span><span class="chip c2"><i></i>Contur sky-500</span></div></div></Section>
-  <Section ground="navy" seed={37}><div class="demo"><span class="eb sky-d">3 · Navy</span><h2>Navy cu albastru sky-500</h2><p>Pete sky-500 și zone mai închise, puțin roz.</p></div></Section>
-  <Section ground="navy" seed={41}><div class="demo"><span class="eb sky-d">4 · Navy, aceeași culoare</span><h2>Alt aranjament, aceeași culoare</h2><p>Cifrele și accentele mici pot fi sky-500 pe navy închis.</p></div></Section>
-  <Section ground="light" seed={53}><div class="demo"><span class="eb sky">5 · Deschis</span><h2>Mai mult sky-300 și sky-500</h2><p>Cele două albastre apar cel mai des în pete.</p></div></Section>
-  <Section ground="orange" seed={67}><div class="demo"><span class="eb navy">6 · Portocaliu</span><h2>Portocaliu viu</h2><p>Pete mai deschise și mai închise de portocaliu.</p></div></Section>
-  <Section ground="peach" seed={79}><div class="demo"><span class="eb sky">7 · Piersică</span><h2>Piersică cu albastru</h2><p>Varianta moale a portocaliului, amestecată cu sky-300.</p></div></Section>
-  <Section ground="light" seed={83}><div class="demo"><span class="eb sky">8 · Deschis</span><h2>Încă un aranjament</h2><p>Fiecare secțiune primește alt număr; același număr dă mereu același desen.</p></div></Section>
-</div>
-
-<main class="board">
-  <p class="h">Culori</p>
-  {colours.map(g => (
-    <>
-      <p class="grp">{g.group}</p>
-      <div class="sw">{g.items.map(([n, hex, use]) => <div><i style={`background:var(--color-${n})`}></i><p><b>{n}</b>{hex}{use && <><br />{use}</>}</p></div>)}</div>
-    </>
-  ))}
-
-  <p class="h">Text · Rubik (rem, scalează cu ecranul)</p>
-  <div class="type">
-    {type.map(([k, t, w]) => <div><code>{k}</code><span style={`font-size:var(--text-${k});line-height:var(--text-${k}--line-height);letter-spacing:var(--text-${k}--letter-spacing, 0);font-weight:${w};${k === 'eyebrow' ? 'text-transform:uppercase' : ''}`}>{t}</span></div>)}
-  </div>
-
-  <p class="h">Colțuri</p>
-  <div class="ui">
-    {['sm', 'md', 'lg', 'xl', 'pill'].map(r => <div style={`border-radius:var(--radius-${r})`}>radius-{r}</div>)}
-  </div>
-</main>
+  <GlassDefs />
+  {board === 'a3' && <BoardA3 />}
+  {board === 'a4' && <BoardA4 />}
 </body>
 </html>

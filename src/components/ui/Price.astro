@@ -1,0 +1,32 @@
+---
+/**
+ * Price (A3, Cata chose option 2).
+ * Light grounds: orange pill, navy-900 digits (7.4:1). Navy grounds: plain orange digits (5.3:1).
+ * `old` shows a struck-through previous price (voucher promos). Values always come from data,
+ * never typed into a page.
+ */
+interface Props { amount: number | string; unit?: string; old?: number | string; on?: 'light' | 'dark'; size?: 'md' | 'lg'; class?: string }
+const { amount, unit = 'lei', old, on = 'light', size = 'md', class: cls } = Astro.props;
+---
+<p class:list={['price', `on-${on}`, `price-${size}`, cls]}>
+  {old != null && <s class="old"><span class="sr">Preț vechi: </span>{old} lei</s>}
+  <span class="now">
+    {old != null && <span class="sr">Preț nou: </span>}
+    <b>{amount}</b> <small>{unit}</small>
+  </span>
+</p>
+
+<style>
+  .price { margin: 0; display: inline-flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+  .now { display: inline-flex; align-items: baseline; gap: 0.35rem; line-height: 1; }
+  .now b { font-weight: var(--font-weight-bold); font-size: var(--text-price); letter-spacing: var(--text-price--letter-spacing); }
+  .price-lg .now b { font-size: 2.7rem; }
+  .now small { font-size: var(--text-small); font-weight: var(--font-weight-medium); }
+
+  .on-light .now { background: var(--price-bg); color: var(--price-ink); padding: 0.5rem 1.05rem 0.55rem; border-radius: var(--radius-pill); box-shadow: var(--shadow-btn); }
+  .on-dark .now { color: var(--price-ink-on-dark); }
+  .on-dark .now small { color: var(--ink-on-dark-soft); }
+
+  .old { font-size: 1.05rem; font-weight: var(--font-weight-medium); color: var(--ctx-muted); text-decoration-thickness: 2px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+</style>

@@ -1,0 +1,67 @@
+---
+/**
+ * Buttons. Colours come from the ground context (global.css), so the same variant works on
+ * light, navy and orange sections.
+ * All are liquid glass (global .liquid) tinted with their colour.
+ * - call: the main action on every page. Orange glass, phone icon, the number itself (navy on orange grounds).
+ * - primary: navy glass (white glass on navy and orange grounds).
+ * - secondary: clear glass.
+ * Touch target ≥ 44px at every root size; visible focus from global.css; press feedback.
+ */
+import Icon, { type IconName } from './Icon.astro';
+import { site } from '../../data/site';
+
+interface Props {
+  variant?: 'call' | 'primary' | 'secondary';
+  href?: string;
+  icon?: IconName;
+  iconEnd?: IconName;
+  size?: 'md' | 'lg';
+  type?: 'button' | 'submit';
+  class?: string;
+}
+const { variant = 'primary', size = 'md', type = 'button', class: cls } = Astro.props;
+const isCall = variant === 'call';
+const href = Astro.props.href ?? (isCall ? site.phoneHref : undefined);
+const icon = Astro.props.icon ?? (isCall ? 'phone' : undefined);
+const iconEnd = Astro.props.iconEnd;
+const hasSlot = Astro.slots.has('default');
+const Tag = href ? 'a' : 'button';
+---
+<Tag class:list={['btn', 'liquid', `btn-${variant}`, `btn-${size}`, cls]} href={href} type={href ? undefined : type}>
+  {icon && <Icon name={icon} size={size === 'lg' ? '1.3rem' : '1.15rem'} stroke={2} />}
+  <span>{hasSlot ? <slot /> : isCall ? site.phone : ''}</span>
+  {iconEnd && <Icon name={iconEnd} size="1.15rem" stroke={2} class="end" />}
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+    min-height: max(44px, 3rem); padding: 0 1.4rem;
+    border-radius: var(--radius-pill);
+    font: inherit; font-weight: var(--font-weight-medium); font-size: 1rem; line-height: 1.1;
+    text-decoration: none; white-space: nowrap; cursor: pointer;
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  }
+  .btn-lg { min-height: max(48px, 3.5rem); padding: 0 1.8rem; font-size: 1.08rem; }
+  .btn:active { transform: scale(0.97); }
+
+  /* every button is liquid glass tinted with its colour (Cata, 24 Nov) */
+  .btn-call { --lg-fill: var(--ctx-call-bg); --lg-solid: var(--color-orange); color: var(--ctx-call-ink); font-weight: var(--font-weight-semibold); --lg-shadow: var(--shadow-btn); font-variant-numeric: tabular-nums; }
+  .btn-primary { --lg-fill: var(--ctx-primary-bg); --lg-solid: var(--color-navy-900); color: var(--ctx-primary-ink); --lg-shadow: var(--shadow-btn-navy); }
+  .btn-secondary { --lg-fill: var(--ctx-secondary-bg); color: var(--ctx-secondary-ink); --lg-shadow: 0 0.6rem 1.4rem -0.9rem rgb(22 36 61 / 0.45); }
+  .btn-call, .btn-primary { --lg-rim: rgb(255 255 255 / 0.55); --lg-edge: rgb(255 255 255 / 0.18); }
+  .btn .end { transition: transform 200ms var(--ease-out); }
+
+  @media (hover: hover) {
+    .btn:hover { transform: translateY(-1px); }
+    .btn-call:hover { --lg-shadow: 0 0.9rem 2rem -0.6rem rgb(253 158 1 / 0.8); }
+    .btn-primary:hover { --lg-shadow: 0 0.9rem 2rem -0.8rem rgb(22 36 61 / 0.75); }
+    .btn:hover .end { transform: translateX(0.2rem); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn, .btn .end { transition: none; }
+    .btn:active, .btn:hover { transform: none; }
+  }
+</style>

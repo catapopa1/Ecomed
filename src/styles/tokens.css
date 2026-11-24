@@ -122,6 +122,14 @@
   --glass-opaque-bg: rgb(255 255 255 / 0.86);
   --glass-blur: blur(18px) saturate(160%);
 
+  /* ── Liquid glass fills (A4, Nimbus-style: flat tints, no inner gradient) ─ */
+  --lg-white: rgb(255 255 255 / 0.16);        /* cards, clear buttons, icon discs: clear glass */
+  --lg-white-soft: rgb(255 255 255 / 0.18);
+  --lg-white-strong: rgb(255 255 255 / 0.7);
+  --lg-dark: rgb(255 255 255 / 0.05);         /* on navy: smoky, clear */
+  --lg-orange: rgb(253 158 1 / 0.8);
+  --lg-navy: rgb(22 36 61 / 0.62);           /* clearer (Cata); white text stays ≥ 5:1 on every light gradient colour */
+
   /* ── Text on grounds ──────────────────────────────────────────────── */
   --ink: var(--color-navy);
   --ink-soft: rgb(35 61 99 / 0.82);           /* 7.6:1 on sky-50 */

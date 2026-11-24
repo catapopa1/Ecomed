@@ -1,0 +1,145 @@
+---
+/**
+ * A4 board: the real UI components on each ground.
+ * Card contents come from src/data/vouchers.ts (vouchers 1 and 4.1); nothing is invented.
+ */
+import Section from '../Section.astro';
+import Button from '../ui/Button.astro';
+import Glass from '../ui/Glass.astro';
+import Price from '../ui/Price.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import Icon, { icons, type IconName } from '../ui/Icon.astro';
+import IconDisc from '../ui/IconDisc.astro';
+import { VOUCHERS, GROUPS } from '../../data/vouchers';
+
+const v1 = VOUCHERS.find(v => v.id === '1')!;
+const v41 = VOUCHERS.find(v => v.id === '4.1')!;
+const g1 = GROUPS[0];
+const names = Object.keys(icons) as IconName[];
+---
+<Section ground="light" seed={101}>
+  <p class="tag">A4 · 1 · Fundal deschis</p>
+  <SectionHead eyebrow="Clinica Ecomed · Oradea" title="Medic de familie și recuperare medicală în Oradea" level={2} size="h1">
+    <p>Text de deschidere centrat. Conținutul real vine din textele aprobate · TODO (ask Cata).</p>
+  </SectionHead>
+  <div class="row">
+    <Button variant="call" size="lg" />
+    <Button variant="primary" size="lg" iconEnd="arrow" href="#">Vedeți voucherele</Button>
+    <Button variant="secondary" size="lg" href="#">Serviciile noastre</Button>
+  </div>
+  <div class="icons">{names.map(n => <IconDisc name={n} />)}</div>
+
+
+  <div class="cards">
+    <Glass variant="liquid" class="card">
+      <p class="label">Liquid glass</p>
+      <IconDisc name="heart-pulse" />
+      <h3>{v1.cardTitle}</h3>
+      <ul class="list">{v1.services.map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}{s.sessions && <span> · {s.sessions} ședințe</span>}</li>)}</ul>
+      <p class="meta"><Icon name="clock" size="1.05rem" />Ședințe de {v1.durationMin} de minute</p>
+      <Price amount={v1.price!} unit={`lei / ${v1.priceUnit}`} />
+    </Glass>
+    <Glass variant="liquid" class="card">
+      <p class="label">Liquid glass · preț redus</p>
+      <IconDisc name="gift" />
+      <h3>{v41.cardTitle}</h3>
+      <ul class="list">{v41.services.map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}</li>)}</ul>
+      <p class="meta"><Icon name="clock" size="1.05rem" />{v41.durationMin} de minute</p>
+      <Price amount={v41.promo?.type === 'discount' ? v41.promo.price : v41.price!} old={v41.price!} unit={`lei / ${v41.priceUnit}`} />
+    </Glass>
+    <Glass variant="opaque" class="card">
+      <p class="label">Opaque glass · text lung, formulare</p>
+      <IconDisc name="calendar" />
+      <h3>{g1.title}</h3>
+      <p class="body">{g1.hook}. Sticla opacă se folosește unde textul trebuie citit perfect, peste orice pată de culoare.</p>
+      <Button variant="primary" iconEnd="arrow" href="#">Vedeți pachetele</Button>
+    </Glass>
+  </div>
+</Section>
+
+<Section ground="navy" seed={202}>
+  <p class="tag dark">A4 · 2 · Fundal navy</p>
+  <SectionHead eyebrow="Vouchere cadou" title="Aceleași componente pe navy">
+    <p>Butoanele, etichetele, iconițele și prețul își schimbă singure stilul după fundal.</p>
+  </SectionHead>
+  <div class="row">
+    <Button variant="call" size="lg" />
+    <Button variant="primary" size="lg" iconEnd="arrow" href="#">Vedeți voucherele</Button>
+    <Button variant="secondary" size="lg" href="#">Serviciile noastre</Button>
+  </div>
+  <div class="icons">{names.map(n => <IconDisc name={n} />)}</div>
+
+  <div class="cards two">
+    <Glass variant="dark" class="card">
+      <p class="label">Dark glass</p>
+      <IconDisc name="heart-pulse" />
+      <h3>{v1.cardTitle}</h3>
+      <ul class="list">{v1.services.map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}{s.sessions && <span> · {s.sessions} ședințe</span>}</li>)}</ul>
+      <Price amount={v1.price!} unit={`lei / ${v1.priceUnit}`} on="dark" />
+    </Glass>
+    <Glass variant="dark" class="card">
+      <p class="label">Dark glass · preț redus</p>
+      <IconDisc name="gift" />
+      <h3>{v41.cardTitle}</h3>
+      <ul class="list">{v41.services.map(s => <li><Icon name="check" size="1.1rem" stroke={2.2} />{s.name}</li>)}</ul>
+      <Price amount={v41.promo?.type === 'discount' ? v41.promo.price : v41.price!} old={v41.price!} unit={`lei / ${v41.priceUnit}`} on="dark" />
+    </Glass>
+  </div>
+</Section>
+
+<Section ground="orange" seed={303}>
+  <p class="tag">A4 · 3 · Fundal portocaliu</p>
+  <SectionHead eyebrow="Programări" title="Pe portocaliu, butonul de apel devine navy">
+    <p>Ca să nu dispară portocaliu pe portocaliu. Iconițele: linie portocalie pe disc alb.</p>
+  </SectionHead>
+  <div class="row">
+    <Button variant="call" size="lg" />
+    <Button variant="primary" size="lg" iconEnd="arrow" href="#">Vedeți voucherele</Button>
+    <Button variant="secondary" size="lg" href="#">Contact</Button>
+  </div>
+  <div class="icons">{names.map(n => <IconDisc name={n} />)}</div>
+
+</Section>
+
+<Section ground="peach" seed={505}>
+  <p class="tag">A4 · 4 · Piersică · stiluri de text centrate</p>
+  <div class="stack">
+    <SectionHead eyebrow="Display · titlul paginii de start" title="Medic de familie în Oradea" level={2} size="display" />
+    <SectionHead eyebrow="H1 · titlul unei pagini" title="Recuperare medicală" level={2} size="h1">
+      <p>Lead: textul de deschidere, mai mare decât corpul, centrat, maximum ~70 de caractere pe rând.</p>
+    </SectionHead>
+    <SectionHead eyebrow="H2 · titlul unei secțiuni" title={g1.title}>
+      <p>{g1.hook}.</p>
+    </SectionHead>
+  </div>
+  <div class="icons">{names.map(n => <IconDisc name={n} />)}</div>
+</Section>
+
+<style>
+  .tag { position: absolute; top: -4.5rem; left: 0; margin: 0; font-size: var(--text-small); font-weight: 600; color: var(--ink-soft); }
+  .tag.dark { color: var(--ink-on-dark-soft); }
+  .row { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-top: 2.4rem; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: var(--container-page); margin: 4.5rem auto 0; }
+  .cards.two { grid-template-columns: repeat(2, 26rem); justify-content: center; }
+  .cards :global(.card) { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.9rem; }
+  .cards h3 { font-size: var(--text-h3); line-height: var(--text-h3--line-height); letter-spacing: var(--text-h3--letter-spacing); }
+  .label { margin: 0; font-size: var(--text-eyebrow); letter-spacing: var(--text-eyebrow--letter-spacing); text-transform: uppercase; font-weight: 700; color: var(--ctx-eyebrow); }
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+  .list li { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.5rem; }
+  .list li :global(.icon) { color: var(--ctx-eyebrow); }
+  .list span { color: var(--ctx-muted); }
+  .meta { margin: 0; display: inline-flex; align-items: center; gap: 0.45rem; color: var(--ctx-muted); font-size: var(--text-small); }
+  .body { margin: 0; color: var(--ctx-muted); }
+
+  .icons { display: flex; justify-content: center; gap: 0.8rem; margin-top: 2.2rem; }
+  .icon-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: var(--container-page); margin: 0 auto; }
+  .opt { text-align: center; padding: 2rem 1.5rem; border-radius: var(--radius-lg); background: var(--glass-opaque-bg); box-shadow: var(--shadow-card); }
+  .ic { display: grid; grid-template-columns: repeat(5, auto); justify-content: center; gap: 0.9rem; margin: 1.4rem 0; }
+  .ic span { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; }
+  .ic .a { background: var(--color-sky-300); color: var(--color-navy-900); }
+  .ic .b { background: var(--color-white); color: var(--color-orange); box-shadow: 0 0.4rem 1rem -0.5rem rgb(35 61 99 / 0.35), inset 0 0 0 1px var(--color-orange-100); }
+  .ic .c { color: var(--color-sky-500); }
+  .note { margin: 0; font-size: var(--text-small); color: var(--ink-soft); }
+
+  .stack { display: grid; gap: 4.5rem; }
+</style>

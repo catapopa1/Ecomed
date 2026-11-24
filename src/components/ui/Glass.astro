@@ -1,0 +1,41 @@
+---
+/**
+ * Glass surfaces.
+ * - liquid: translucent white with blur; the paint behind shows through (cards on light grounds).
+ * - opaque: near-solid white (long text, forms, anything that must read perfectly).
+ * - dark: translucent white on navy grounds.
+ * Liquid recipe (Nimbus-style tint, blur, inset rim; flat, no gradient) lives in global.css (.liquid).
+ * Fallback: without backdrop-filter, or with prefers-reduced-transparency, every variant becomes solid.
+ * Keep ≤ 3 blurred surfaces on one phone screen (PLAN A4).
+ */
+interface Props { variant?: 'liquid' | 'opaque' | 'dark'; as?: string; class?: string; pad?: 'md' | 'lg' | 'none' }
+const { variant = 'liquid', as: Tag = 'div', class: cls, pad = 'md' } = Astro.props;
+---
+<Tag class:list={['glass', `glass-${variant}`, variant !== 'opaque' && 'liquid refract', pad !== 'none' && `pad-${pad}`, cls]}><slot /></Tag>
+
+<style>
+  .glass { border-radius: var(--radius-lg); }
+  .pad-md { padding: 1.6rem 1.7rem; }
+  .pad-lg { padding: 2.4rem 2.6rem; }
+
+  /* liquid: follows the ground (white glass on light, smoky glass on navy); see .liquid in global.css */
+  .glass-liquid {
+    --lg-fill: var(--ctx-glass-bg); --lg-rim: var(--ctx-glass-rim, rgb(255 255 255 / 0.8));
+    --lg-solid: var(--ctx-glass-solid, var(--color-white));
+    --lg-shadow: var(--ctx-card-shadow, 0 12px 32px -14px rgb(22 36 61 / 0.45), 0 2px 6px rgb(22 36 61 / 0.08));
+  }
+  /* dark: force the navy version anywhere */
+  .glass-dark {
+    --lg-fill: var(--lg-dark); --lg-rim: rgb(255 255 255 / 0.34); --lg-solid: var(--color-navy-700);
+    --lg-shadow: 0 14px 36px -16px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.12);
+    color: var(--ink-on-dark);
+  }
+  .glass-opaque {
+    background: var(--glass-opaque-bg); border: 1px solid var(--color-white);
+    box-shadow: var(--shadow-card);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-opaque { background: var(--color-white); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  }
+</style>

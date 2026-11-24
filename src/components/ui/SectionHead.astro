@@ -1,0 +1,30 @@
+---
+/**
+ * Centred section heading: eyebrow + title + lead. Colours follow the ground (global.css context).
+ * `level` picks the tag (h1 on page heroes, h2 for sections); `size` picks the visual size.
+ */
+interface Props { eyebrow?: string; title: string; level?: 1 | 2 | 3; size?: 'display' | 'h1' | 'h2'; class?: string }
+const { eyebrow, title, level = 2, size = level === 1 ? 'h1' : 'h2', class: cls } = Astro.props;
+const H = `h${level}`;
+---
+<header class:list={['head', cls]}>
+  {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <H class:list={['title', `t-${size}`]}>{title}</H>
+  {Astro.slots.has('default') && <div class="lead"><slot /></div>}
+</header>
+
+<style>
+  .head { max-width: 46rem; margin: 0 auto; text-align: center; }
+  .eyebrow {
+    margin: 0 0 1rem; color: var(--ctx-eyebrow);
+    font-size: var(--text-eyebrow); line-height: var(--text-eyebrow--line-height);
+    letter-spacing: var(--text-eyebrow--letter-spacing); font-weight: var(--font-weight-bold); text-transform: uppercase;
+  }
+  .title { font-weight: var(--font-weight-semibold); }
+  .t-display { font-size: var(--text-display); line-height: var(--text-display--line-height); letter-spacing: var(--text-display--letter-spacing); }
+  .t-h1 { font-size: var(--text-h1); line-height: var(--text-h1--line-height); letter-spacing: var(--text-h1--letter-spacing); }
+  .t-h2 { font-size: var(--text-h2); line-height: var(--text-h2--line-height); letter-spacing: var(--text-h2--letter-spacing); }
+  .lead { margin: 1.2rem auto 0; max-width: var(--container-text); color: var(--ctx-muted); font-size: var(--text-lead); line-height: var(--text-lead--line-height); }
+  .lead :global(p) { margin: 0; }
+  .lead :global(p + p) { margin-top: 0.8rem; }
+</style>
