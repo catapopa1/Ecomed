@@ -1,0 +1,125 @@
+---
+/**
+ * Voucher gallery: the 7 groups as a horizontal accordion (the 21st.dev "Elastic Gallery" pattern Cata
+ * picked: the active card opens wide, the others fold into narrow strips). Each card is the group's
+ * first REAL voucher front (M/vouchere → src/assets/vouchere). Hover, focus or tap opens a card; on an
+ * open card the click goes to the group page. Under it: the open group's title, hook and links.
+ * No JS: every card is a plain link and the first one is open.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Button from '../ui/Button.astro';
+import { GROUPS, vouchersIn } from '../../data/vouchers';
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../../assets/vouchere/*-fata.jpg', { eager: true });
+const front = (id: string) => files[`../../assets/vouchere/voucher-${id.toLowerCase().replace('.', '-')}-fata.jpg`]?.default;
+
+const items = GROUPS.map((g) => {
+  const list = vouchersIn(g.id);
+  const v = list[0];
+  return { g, v, n: list.length, img: v ? front(v.id) : undefined };
+});
+const plural = (n: number) => (n === 1 ? '1 voucher' : `${n} vouchere`);
+---
+<div class="eg" data-eg>
+  <ul class="eg-row" role="list">
+    {items.map(({ g, v, n, img }, i) => (
+      <li class:list={['eg-item', { on: i === 0 }]} data-i={i} data-title={g.title} data-hook={g.hook} data-href={g.slug} data-count={plural(n)}>
+        <a href={g.slug} aria-label={`${g.title}: ${plural(n)}`}>
+          {img && <Image src={img} alt={v ? `Voucher ${v.line}: ${v.title}, ${v.subtitle}` : ''} widths={[480, 900, 1400]} sizes="(max-width: 820px) 90vw, 46rem" loading={i < 2 ? 'eager' : 'lazy'} />}
+          <span class="eg-veil" aria-hidden="true"></span>
+          <span class="eg-label" aria-hidden="true"><span>{g.title}</span><b>{g.order}</b></span>
+        </a>
+      </li>
+    ))}
+  </ul>
+  <div class="eg-cap">
+    <div class="eg-txt" aria-live="polite">
+      <span class="eg-n">Categoria <b data-cap="n">1</b> din 7 · <span data-cap="count">{plural(items[0].n)}</span></span>
+      <h3 data-cap="title">{items[0].g.title}</h3>
+      <p data-cap="hook">{items[0].g.hook}</p>
+    </div>
+    <div class="eg-btns">
+      <span data-cap="link"><Button variant="primary" href={items[0].g.slug} iconEnd="arrow">Vedeți voucherele</Button></span>
+      <Button variant="secondary" href="/vouchere/">Toate categoriile</Button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const fine = matchMedia('(hover: hover) and (pointer: fine)');
+  document.querySelectorAll<HTMLElement>('[data-eg]').forEach((root) => {
+    const items = [...root.querySelectorAll<HTMLElement>('.eg-item')];
+    const cap = (k: string) => root.querySelector<HTMLElement>(`[data-cap="${k}"]`)!;
+    const txt = root.querySelector<HTMLElement>('.eg-txt')!;
+    let on = 0, swap = 0;
+    const open = (i: number) => {
+      if (i === on) return;
+      items[on].classList.remove('on'); items[i].classList.add('on'); on = i;
+      const d = items[i].dataset;
+      txt.classList.add('out');
+      clearTimeout(swap);
+      swap = window.setTimeout(() => {
+        cap('n').textContent = String(i + 1);
+        cap('count').textContent = d.count!;
+        cap('title').textContent = d.title!;
+        cap('hook').textContent = d.hook!;
+        cap('link').querySelector('a')!.setAttribute('href', d.href!);
+        txt.classList.remove('out');
+      }, 160);
+    };
+    items.forEach((li, i) => {
+      li.addEventListener('pointerenter', () => { if (fine.matches) open(i); });
+      li.addEventListener('focusin', () => open(i));
+      // touch: the first tap opens the card, the second follows the link
+      li.querySelector('a')!.addEventListener('click', (e) => { if (i !== on) { e.preventDefault(); open(i); } });
+    });
+  });
+</script>
+
+<style>
+  .eg { --h: min(25rem, 44vh); max-width: var(--container-page); margin: 2rem auto 0; }
+  .eg-row { display: flex; gap: 0.7rem; height: var(--h); margin: 0; padding: 0; list-style: none; }
+  .eg-item {
+    position: relative; flex: 1 1 0; min-width: 0; border-radius: 1.4rem; overflow: hidden;
+    box-shadow: 0 1.2rem 2.6rem -1.4rem rgb(22 36 61 / 0.55), inset 0 0 0 1px rgb(255 255 255 / 0.5);
+    transition: flex 720ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* the open card shows the whole front (the fronts are 2752 × 1536) */
+  .eg-item.on { flex: 0 0 calc(var(--h) * 1.792); }
+  .eg-item a { position: absolute; inset: 0; display: block; color: inherit; border-radius: inherit; }
+  .eg-item a:focus-visible { outline: 3px solid var(--color-navy-900); outline-offset: -3px; }
+  .eg-item :global(img) {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 20% 50%;
+    transition: object-position 720ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .eg-item.on :global(img) { object-position: 50% 50%; }
+  /* folded strips: a navy veil and the group's number + name, written upwards */
+  .eg-veil { position: absolute; inset: 0; background: linear-gradient(to top, rgb(22 36 61 / 0.88), rgb(22 36 61 / 0.35) 55%, rgb(22 36 61 / 0.15)); transition: opacity 420ms ease; }
+  .eg-label {
+    position: absolute; left: 50%; bottom: 1.1rem; translate: -50% 0; display: flex; flex-direction: column; align-items: center; gap: 0.7rem;
+    color: #fff; transition: opacity 300ms ease;
+  }
+  .eg-label b { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--color-orange, #F28C00); font-size: 0.95rem; }
+  .eg-label span { writing-mode: vertical-rl; rotate: 180deg; font-size: 0.92rem; line-height: 1.2; font-weight: 600; max-height: calc(var(--h) - 5rem); text-wrap: balance; }
+  .eg-item.on .eg-veil, .eg-item.on .eg-label { opacity: 0; }
+
+  .eg-cap { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.6rem; margin-top: 1.4rem; }
+  .eg-txt { transition: opacity 160ms ease, translate 160ms ease; }
+  .eg-txt.out { opacity: 0; translate: 0 0.4rem; }
+  .eg-n { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.06em; color: var(--ctx-muted); }
+  .eg-txt h3 { margin: 0.25rem 0 0.2rem; font-size: 1.7rem; line-height: 1.2; font-weight: 600; }
+  .eg-txt p { margin: 0; color: var(--ctx-muted); font-size: 1.05rem; }
+  .eg-btns { display: flex; gap: 0.7rem; flex-shrink: 0; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .eg-item:not(.on):hover .eg-veil { opacity: 0.75; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .eg-item, .eg-item :global(img), .eg-txt { transition: none; }
+  }
+  @media (max-width: 820px) {
+    .eg { --h: 15rem; }
+    .eg-cap { flex-direction: column; align-items: flex-start; }
+  }
+</style>

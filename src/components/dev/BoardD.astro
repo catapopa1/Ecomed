@@ -12,7 +12,7 @@ import SectionHead from '../ui/SectionHead.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
 import { site } from '../../data/site';
-import { GROUPS } from '../../data/vouchers';
+import VoucherGallery from '../home/VoucherGallery.astro';
 
 const services = [
   { icon: 'stethoscope', t: 'Medicină de familie', d: 'Adulți și copii: consultații, controale periodice și prevenție.', href: '/medicina-de-familie/', c: '#7FB0EC' },
@@ -57,22 +57,11 @@ const quotes = [
     </Section>
   </div>
 
-  <!-- 2 → 3: a circle opens; inside, the vouchers scroll sideways -->
+  <!-- 2 → 3: a circle opens on the voucher gallery (real fronts, accordion) -->
   <div class="scene" data-tx="iris">
     <Section ground="peach" seed={203}>
       <SectionHead eyebrow="Vouchere" title="Pentru dumneavoastră sau cadou" />
-      <div class="hview">
-        <div class="htrack" data-htrack>
-          {GROUPS.map((g) => (
-            <a class="vg liquid" href={g.slug}>
-              <span class="vg-front">fronturile reale ale voucherelor</span>
-              <span class="vg-n">{g.order} / 7</span>
-              <h3>{g.title}</h3><p>{g.hook}</p>
-            </a>
-          ))}
-        </div>
-      </div>
-      <div class="center"><Button variant="primary" href="/vouchere/" iconEnd="arrow">Toate voucherele</Button></div>
+      <VoucherGallery />
     </Section>
   </div>
 
