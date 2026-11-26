@@ -30,6 +30,7 @@ export function build() {
   ScrollTrigger.refresh();
   buildPaging();
   document.documentElement.classList.add('motion-ready');
+  dispatchEvent(new Event('motion-ready'));   // the hero drawing waits for this (Hero.astro)
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build, { once: true });

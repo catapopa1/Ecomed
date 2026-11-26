@@ -289,7 +289,17 @@ export function buildStage(root: ParentNode = document) {
     skip.classList.toggle('up', dir < 0);
     skip.querySelector('.lbl')!.textContent = dir < 0 ? skip.dataset.up! : skip.dataset.down!;
   };
+  // a scene is "settled" once its entrance has finished: heavy content (the Google map iframe) only shows then,
+  // so it never rides a moving, clipped layer (Cata: the Program transition "is laggy")
+  let settled: HTMLElement | null = null;
+  const settle = (time: number) => {
+    let s: HTMLElement | null = null;
+    scenes.forEach((sc, i) => { const d = i ? (TX[sc.dataset.tx ?? ''] ?? TX.lift).d : 0; const end = i + 1 < scenes.length ? enterAt[i + 1] : Infinity; if (time >= (i ? enterAt[i] : 0) + d - 0.02 && time < (end ?? Infinity)) s = sc; });
+    if (s === settled) return;
+    settled?.classList.remove('settled'); settled = s; (s as HTMLElement | null)?.classList.add('settled');
+  };
   const tell = (time: number) => {
+    settle(time);
     let k = 0;
     for (let i = 0; i < mids.length; i++) if (time >= mids[i]) k = i;
     if (k === shown) return;

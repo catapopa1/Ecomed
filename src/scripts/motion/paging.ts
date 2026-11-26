@@ -139,6 +139,9 @@ export function buildPaging() {
     flight = g; tgt = g.to; run();
   };
 
+  // the header's name / Acasă on the home page ask for the top (Header.astro)
+  const onPageTo = (e: Event) => { const d = (e as CustomEvent<{ y: number; done: boolean }>).detail; d.done = true; computeStops(); glideTo(d.y, performance.now(), Math.max(1, Math.min(2.6, (Math.abs(d.y - scrollY) / innerHeight) * 0.35))); };
+  addEventListener('page-to', onPageTo);
   setPager((y) => { computeStops(); const dist = Math.abs(y - scrollY) / innerHeight; glideTo(y, performance.now(), Math.max(1.8, Math.min(3.2, dist * 0.5))); });   // skip button: calm, ~0.5 s a screen
 
   /* ── gestures ── */
@@ -222,5 +225,5 @@ export function buildPaging() {
 
   addEventListener('wheel', onWheel, { passive: false });
   addEventListener('keydown', onKey);
-  off = () => { removeEventListener('wheel', onWheel); removeEventListener('keydown', onKey); cancelAnimationFrame(raf); };
+  off = () => { removeEventListener('page-to', onPageTo); removeEventListener('wheel', onWheel); removeEventListener('keydown', onKey); cancelAnimationFrame(raf); };
 }

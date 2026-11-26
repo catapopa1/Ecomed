@@ -17,7 +17,8 @@ import Button from './ui/Button.astro';
 import { site } from '../data/site';
 import { TOP, MAIN_SERVICES, AUX_SERVICES, isPage, isUnder } from '../data/nav';
 
-const path = Astro.url.pathname;
+// the home test board (/dev/d/) behaves as the home page
+const path = Astro.url.pathname.startsWith('/dev/d') ? '/' : Astro.url.pathname;
 const svcIcons: IconName[] = ['stethoscope', 'movement', 'sparkles'];
 /* phone menu: each link gets its own colour disc (palette: sky, orange, blush) */
 /* the services keep one colour each, in the desktop panel and in the phone menu */
@@ -140,7 +141,7 @@ const current = (href: string, panel?: boolean) =>
   const items = document.querySelector<HTMLElement>('[data-items]');
   const ind = document.querySelector<HTMLElement>('[data-ind]');
   if (items && ind) {
-    const home = () => items.querySelector<HTMLElement>('.link[data-on]');
+    const home = () => null as HTMLElement | null;   // the drop is the hover; the current page has its own orange mark
     const place = (el: HTMLElement | null, instant = false) => {
       if (!el) { ind.style.opacity = '0'; return; }
       const r = el.getBoundingClientRect(), p = items.getBoundingClientRect();
@@ -290,6 +291,21 @@ const current = (href: string, panel?: boolean) =>
   openBtn?.addEventListener('click', openMenu);
   menu?.querySelector('[data-menu-close]')?.addEventListener('click', closeMenu);
   menu?.addEventListener('cancel', (e) => { e.preventDefault(); closeMenu(); });   // Esc, animated too
+
+  /* ── on the home page, the name and Acasă glide back to the top instead of reloading ── */
+  const onHome = location.pathname === '/' || location.pathname.startsWith('/dev/d');
+  if (onHome) {
+    document.querySelectorAll<HTMLAnchorElement>('.site-header a[href="/"], .mmenu a[href="/"]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+        e.preventDefault();
+        closeMenu();
+        const ask = new CustomEvent('page-to', { detail: { y: 0, done: false } });
+        dispatchEvent(ask);                     // the section paging glides there (paging.ts)
+        if (!ask.detail.done) scrollTo({ top: 0, behavior: still.matches ? 'auto' : 'smooth' });
+      });
+    });
+  }
   menu?.addEventListener('close', () => { lock(false); openBtn?.focus(); });
   menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => { if (!a.target) closeMenu(); }));
   desk.addEventListener('change', (e) => { if (e.matches && menu?.open) finish(); });
@@ -317,7 +333,8 @@ const current = (href: string, panel?: boolean) =>
   .bar, .brand-sub, .link, .chev, .round { transition: color 300ms var(--ease-out), background-color 300ms var(--ease-out); }
   .site-header[data-ground='navy'] .bar { --lg-fill: rgb(255 255 255 / 0.08); --lg-bright: 1.04; --lg-sat: 1.05; --lg-glow: rgb(255 255 255 / 0.14);
     --lg-shadow: 0 0.9rem 2.4rem -1.2rem rgb(0 0 0 / 0.55); color: var(--color-white); }
-  .site-header[data-ground='navy'] .brand-sub { color: var(--color-sky-300); }
+  .site-header[data-ground='navy'] .brand-sub { color: var(--color-orange); }
+  .site-header[data-ground='navy'] .link[aria-current='page'], .site-header[data-ground='navy'] .link[data-on] { background: rgb(253 158 1 / 0.2); box-shadow: inset 0 0 0 1.5px rgb(253 158 1 / 0.7); }
   .site-header[data-ground='navy'] .link, .site-header[data-ground='navy'] .chev { color: rgb(255 255 255 / 0.82); }
   .site-header[data-ground='navy'] .link[aria-current='page'], .site-header[data-ground='navy'] .link[data-on] { color: var(--color-white); }
   .site-header[data-ground='navy'] .ind { background: rgb(255 255 255 / 0.14); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 0.4rem 1rem -0.4rem rgb(0 0 0 / 0.4); }
@@ -335,7 +352,11 @@ const current = (href: string, panel?: boolean) =>
     gap: 0.5rem; border-radius: var(--radius-pill); color: var(--color-navy); text-decoration: none; font-weight: 400; font-size: 1rem;
     transition: color 200ms var(--ease-out);
   }
-  .link[aria-current='page'], .link[data-on] { color: var(--color-navy-900); font-weight: 500; }
+  /* the current page (Cata): a soft orange fill and a fine orange rim, bolder text; the glass drop is only the hover */
+  .link[aria-current='page'], .link[data-on] {
+    color: var(--color-navy-900); font-weight: 600;
+    background: rgb(253 158 1 / 0.16); box-shadow: inset 0 0 0 1.5px rgb(253 158 1 / 0.55);
+  }
   .link :global(.icon) { opacity: 0.85; }
   .has-panel .link { padding-right: 0.35rem; }
   .chev {
@@ -493,7 +514,7 @@ const current = (href: string, panel?: boolean) =>
   .m-top { display: grid; grid-template-columns: 3rem 1fr 3rem; align-items: center; height: 3.9rem; padding: 0 0.45rem; }
   .m-brand { grid-column: 2; justify-self: center; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0; color: var(--color-white); }
   .m-brand .brand-name { font-size: 1.3rem; }
-  .m-brand .brand-sub { font-size: 0.78rem; color: var(--color-sky-300); }
+  .m-brand .brand-sub { font-size: 0.78rem; color: var(--color-orange); }
   .m-close { grid-column: 3; --lg-fill: rgb(255 255 255 / 0.12); color: var(--color-white); }
 
   /* the list sits in the middle of the free space between the top row and the call button */

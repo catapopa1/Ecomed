@@ -11,6 +11,7 @@ import Hero from '../home/Hero.astro';
 import SectionHead from '../ui/SectionHead.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
+import { Image } from 'astro:assets';
 import { site } from '../../data/site';
 import VoucherGallery from '../home/VoucherGallery.astro';
 
@@ -22,11 +23,17 @@ const services = [
 /* one colour per recommendation (brand sky / orange / peach tones; no mauve outside gradients) */
 const recColors = ['#5E93D6', '#F5A02A', '#FF8F70', '#7FB8E8', '#FFC861'];
 const extra = ['Ecografie', 'EKG', 'Holter TA', 'Osteodensitometrie'];
+/* photos: M/staff, unretouched (T10: staff consent for the website still to confirm before going live).
+   One colour per person; `pos`/`zoom` frame the face (Dr. Baiduca's photo is a wide desk shot). */
+import pTeusdea from '../../assets/staff/dr-teusdea-alina.jpg';
+import pBaiduca from '../../assets/staff/dr-baiduca-alexandru-echipa.jpg';   // standing, cropped from the team photo (Cata)
+import pBodogai from '../../assets/staff/bodogai-anca.jpg';
+import pGelnic from '../../assets/staff/gelnic-corina-maria.jpg';
 const staff = [
-  { n: 'Dr. Teușdea Alina', r: 'Medic primar Medicină de familie · Competență în ecografie generală' },
-  { n: 'Dr. Baiduca Alexandru', r: 'Medic specialist Medicină fizică și de reabilitare' },
-  { n: 'Bodogai Anca', r: 'Fiziokinetoterapeut · Kinetoterapie la clinică și la domiciliu' },
-  { n: 'Gelnic Corina Maria', r: 'Asistent medical generalist · Balneofiziokinetoterapeut' },
+  { n: 'Dr. Teușdea Alina', r: 'Medic primar Medicină de familie · Competență în ecografie generală', img: pTeusdea, c: '#5E93D6', pos: '50% 30%', zoom: 1 },
+  { n: 'Dr. Baiduca Alexandru', r: 'Medic specialist Medicină fizică și de reabilitare', img: pBaiduca, c: '#F5A02A', pos: '50% 30%', zoom: 1 },
+  { n: 'Bodogai Anca', r: 'Fiziokinetoterapeut · Kinetoterapie la clinică și la domiciliu', img: pBodogai, c: '#FF8F70', pos: '50% 30%', zoom: 1 },
+  { n: 'Gelnic Corina Maria', r: 'Asistent medical generalist · Balneofiziokinetoterapeut', img: pGelnic, c: '#E58FB8', pos: '50% 30%', zoom: 1 },
 ];
 const quotes = [
   'Prevenția nu este pentru cei bolnavi, ci pentru cei care vor să rămână sănătoși, la orice vârstă.',
@@ -80,10 +87,12 @@ const quotes = [
       <SectionHead eyebrow="Echipa noastră" title="Medici și terapeuți specializați" />
       <div class="team">
         {staff.map((p) => (
-          <article class="person liquid">
-            <div class="ph">foto (T10)</div>
-            <h3>{p.n}</h3><p>{p.r}</p>
-          </article>
+          <div class="slot">
+            <article class="person liquid" style={`--c:${p.c};--pos:${p.pos};--zoom:${p.zoom}`}>
+              <div class="ph"><Image src={p.img} alt={p.n} widths={[320, 560, 900, 1400]} sizes={`(max-width: 820px) calc(45vw * ${p.zoom}), calc(18rem * ${p.zoom})`} /></div>
+              <h3>{p.n}</h3><span class="bar" aria-hidden="true"></span><p>{p.r}</p>
+            </article>
+          </div>
         ))}
       </div>
       <div class="center"><Button variant="secondary" href="/despre-noi/" iconEnd="arrow">Despre noi</Button></div>
@@ -114,15 +123,36 @@ const quotes = [
       <SectionHead eyebrow="Program și locație" title="Vă așteptăm la clinică" />
       <div class="visit">
         <div class="hours liquid">
-          {site.hours.map((h) => <p><strong>{h.days}</strong><span>{h.time}</span></p>)}
-          <p class="note">{site.hoursNote}</p>
+          <h3 class="h-title"><Icon name="clock" size="1.6rem" stroke={1.8} />Program</h3>
+          <!-- a drawn heartbeat line (the hero's line-art style) -->
+          <svg class="pulse" viewBox="0 0 220 28" aria-hidden="true"><path d="M2 14h70l8-10 10 22 9-18 6 6h26c4 0 6-6 10-6s6 6 10 6h67" /></svg>
+          <div class="h-rows">
+            {site.hours.map((h, i) => (
+              <p><span class="h-ic"><Icon name={i === 0 ? 'sun' : 'sunset'} size="1.4rem" stroke={1.8} /></span><strong>{h.days}</strong><span class="h-time">{h.time}</span></p>
+            ))}
+          </div>
+          <p class="note"><Icon name="calendar" size="1.2rem" stroke={1.8} />{site.hoursNote}</p>
+          <div class="h-contact">
+            <a href={site.mapsHref}><Icon name="map-pin" size="1.25rem" stroke={1.8} /><span>{site.street}, {site.city}</span></a>
+            <a href={site.phoneHref}><Icon name="phone" size="1.25rem" stroke={1.8} /><span>{site.phone}</span></a>
+          </div>
         </div>
-        <a class="map liquid" href={site.mapsHref}><span>hartă (statică, link spre Google Maps)</span><strong>{site.street}, {site.city}</strong></a>
+        <!-- the live map is visual only (wheel over an iframe would stop the section paging); the whole card opens Google Maps -->
+        <a class="map liquid" href={site.mapsHref} target="_blank" rel="noopener" aria-label={`Deschideți în Google Maps: ${site.street}, ${site.city}`}>
+          <iframe title="Hartă: Centrul Medical Ecomed" data-src="https://www.google.com/maps?q=Str.+Nicolae+Jiga+9,+Oradea&z=16&output=embed" referrerpolicy="no-referrer-when-downgrade" tabindex="-1"></iframe>
+          <span class="map-tag"><Icon name="map-pin" size="1.1rem" stroke={2} />Deschideți în Google Maps</span>
+        </a>
       </div>
       <div class="center btns"><Button variant="call" size="lg" /><Button variant="secondary" size="lg" href="/contact/" iconEnd="arrow">Contact</Button></div>
     </Section>
   </div>
 </div>
+
+<script>
+  // the Google map loads quietly once the page is idle, so it is ready before anyone reaches it
+  const loadMap = () => document.querySelectorAll<HTMLIFrameElement>('iframe[data-src]').forEach((f) => { f.src = f.dataset.src!; f.removeAttribute('data-src'); });
+  addEventListener('load', () => setTimeout(() => ('requestIdleCallback' in window ? requestIdleCallback(loadMap, { timeout: 4000 }) : loadMap()), 2500), { once: true });
+</script>
 
 <style>
   .tx-legend { position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%); z-index: 90; padding: 0.4rem 0.9rem; border-radius: 99px; font-size: 0.8rem; color: var(--color-navy-900); --lg-fill: rgb(255 255 255 / 0.7); }
@@ -160,8 +190,23 @@ const quotes = [
   .video-frame { width: 100%; height: 100vh; height: 100svh; display: grid; place-items: center; background: linear-gradient(135deg, #2A4774, #5A4C7E); color: var(--color-sky-300); }
 
   .team { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
-  .person { padding: 1rem 1rem 1.4rem; border-radius: 1.6rem; display: grid; gap: 0.5rem; }
-  .ph { aspect-ratio: 4 / 5; border-radius: 1.1rem; display: grid; place-items: center; background: rgb(255 255 255 / 0.4); border: 1px dashed rgb(22 36 61 / 0.3); color: var(--ctx-muted); font-size: 0.85rem; }
+  /* each person has a colour: tinted card, coloured rim, a short bar under the name; text centred */
+  .person {
+    padding: 1rem 1rem 1.5rem; border-radius: 1.6rem; display: flex; flex-direction: column; align-items: center; gap: 0.55rem; text-align: center;
+    --lg-fill: color-mix(in srgb, var(--c) 18%, rgb(255 255 255 / 0.45));
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c) 55%, transparent), 0 1.4rem 2.8rem -1.6rem color-mix(in srgb, var(--c) 75%, rgb(22 36 61));
+  }
+  .ph { width: 100%; aspect-ratio: 4 / 5; border-radius: 1.1rem; overflow: hidden; margin-bottom: 0.4rem;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 70%, white), 0 0.8rem 1.6rem -1rem color-mix(in srgb, var(--c) 80%, black); }
+  /* hover (mouse): a slight lift and zoom in place */
+  .slot { display: flex; }
+  .slot > .person { flex: 1; }
+  .person { transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1); }
+  @media (hover: hover) and (pointer: fine) { .person:hover { transform: translateY(-0.3rem) scale(1.03); } }
+  .ph :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos); transform: scale(var(--zoom)); transform-origin: var(--pos); }
+  .person h3 { font-size: 1.35rem; line-height: 1.2; }
+  .person .bar { width: 2.4rem; height: 3px; border-radius: 3px; background: var(--c); }
+  .person p { font-size: 0.98rem; line-height: 1.45; text-wrap: balance; }
 
   /* recommendations: one card at a time, each growing out of its point on the line below */
   .rec { position: relative; max-width: none; }
@@ -188,12 +233,33 @@ const quotes = [
   .rec-skip:focus-visible { outline: 2px solid var(--color-sky-300, #9cc8f0); outline-offset: 3px; }
   @media (hover: hover) and (pointer: fine) { .rec-skip:hover { background: rgb(255 255 255 / 0.16); color: #fff; } }
 
-  .visit { display: grid; grid-template-columns: 1fr 1.3fr; gap: 1.4rem; max-width: 64rem; }
-  .hours { padding: 2rem; border-radius: 1.6rem; }
-  .hours p { display: flex; justify-content: space-between; gap: 1rem; margin: 0 0 0.8rem; }
-  .hours .note { margin: 1.4rem 0 0; color: var(--ctx-muted); }
-  .map { min-height: 14rem; border-radius: 1.6rem; display: grid; place-items: center; align-content: center; gap: 0.6rem; padding: 2rem; color: inherit; text-decoration: none; text-align: center; }
-  .map span { font-size: 0.85rem; color: var(--ctx-muted); }
+  .visit { display: grid; grid-template-columns: 1fr 1.25fr; gap: 1.4rem; max-width: 72rem; }
+  /* left: everything centred; sun / sunset for the morning and afternoon hours, a drawn heartbeat under the title */
+  .hours { padding: 2rem 2.2rem; border-radius: 1.6rem; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 1rem; text-align: center; font-size: 1.25rem; }
+  .h-title { display: flex; align-items: center; justify-content: center; gap: 0.6rem; font-size: 1.7rem; }
+  .h-title :global(.icon), .h-contact :global(.icon) { color: var(--color-orange-ink, #B86200); }
+  .pulse { width: 13rem; height: 1.7rem; margin-top: -0.4rem; }
+  .pulse path { fill: none; stroke: var(--color-orange); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .h-rows { display: flex; justify-content: center; gap: 1rem; width: 100%; }
+  .h-rows p { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; margin: 0; padding: 1rem 0.8rem; border-radius: 1.2rem; background: rgb(255 255 255 / 0.35); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.6); }
+  .h-ic { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: rgb(253 158 1 / 0.18); color: var(--color-orange-ink, #B86200); margin-bottom: 0.2rem; }
+  .h-rows p:last-child .h-ic { background: rgb(94 147 214 / 0.18); color: #3E6FAE; }
+  .h-rows strong { font-size: 1.05rem; }
+  .h-time { font-size: 1.45rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .hours .note { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 0; color: var(--ctx-muted); font-size: 1.1rem; }
+  .h-contact { display: grid; justify-items: center; gap: 0.55rem; width: 100%; padding-top: 1rem; border-top: 1px solid rgb(22 36 61 / 0.12); }
+  .h-contact a { display: inline-flex; align-items: center; gap: 0.55rem; color: inherit; text-decoration: none; font-size: 1.1rem; font-weight: 500; }
+  /* right: the live Google map */
+  .map { position: relative; min-height: 24rem; border-radius: 1.6rem; overflow: hidden; color: inherit; text-decoration: none; padding: 0.5rem; }
+  .map iframe { width: 100%; height: 100%; min-height: 23rem; border: 0; border-radius: 1.2rem; pointer-events: none; display: block; background: #E8EEF4; }
+  /* the iframe shows only once the scene has landed (no live map on a moving layer); fades in */
+  :global(.stage-on) .map iframe { visibility: hidden; opacity: 0; transition: opacity 400ms ease 120ms, visibility 0s linear 520ms; }
+  :global(.stage-on .settled) .map iframe { visibility: visible; opacity: 1; transition: opacity 400ms ease 120ms, visibility 0s; }
+  .map { background: #E8EEF4; }
+  .map-tag { position: absolute; left: 1.2rem; bottom: 1.2rem; display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.55rem 0.95rem; border-radius: 999px;
+    background: var(--color-navy-900); color: #fff; font-size: 0.95rem; font-weight: 500; box-shadow: 0 0.6rem 1.4rem -0.6rem rgb(22 36 61 / 0.6); }
+  .map-tag :global(.icon) { color: var(--color-orange); }
+  @media (hover: hover) and (pointer: fine) { .map:hover .map-tag { background: var(--color-orange); color: var(--color-navy-900); } .map:hover .map-tag :global(.icon) { color: var(--color-navy-900); } .h-contact a:hover span { text-decoration: underline; } }
 
   @media (max-width: 820px) {
     .svc, .team, .visit { grid-template-columns: 1fr; }

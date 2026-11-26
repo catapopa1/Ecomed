@@ -75,10 +75,25 @@ const tubeList = [
       {/* hide before first paint so the draw starts from nothing; skipped with reduced motion (and without JS) */}
       <script is:inline>
         (function () {
+          // the home page always opens on the hero (the stage pages section by section; a restored
+          // in-between position would also hide the drawing)
+          if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+          scrollTo(0, 0);
           var a = document.getElementById('hero-art');
           if (!a || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
           a.classList.add('pre');
-          requestAnimationFrame(function () { requestAnimationFrame(function () { a.classList.remove('pre'); a.classList.add('go'); }); });
+          // start once the page has loaded and the motion engine is built (busy main thread = the draw
+          // would finish unseen); fallback after 3 s
+          var started = false, loaded = document.readyState === 'complete', ready = document.documentElement.classList.contains('motion-ready');
+          function go() {
+            if (started) return; started = true;
+            requestAnimationFrame(function () { requestAnimationFrame(function () { a.classList.remove('pre'); a.classList.add('go'); }); });
+          }
+          function check() { if (loaded && ready) setTimeout(go, 120); }
+          addEventListener('load', function () { loaded = true; check(); }, { once: true });
+          addEventListener('motion-ready', function () { ready = true; check(); }, { once: true });
+          setTimeout(go, 3000);
+          check();
         })();
       </script>
     </div>
