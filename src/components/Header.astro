@@ -215,11 +215,20 @@ const current = (href: string, panel?: boolean) =>
   if (header) {
     const under = new Set<HTMLElement>();
     let io: IntersectionObserver | null = null;
+    let stageGround: string | null = null;
     const pick = () => {
       // the last one in the document is on top (deck cards stack in DOM order)
       const top = [...under].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1)).pop();
-      header.dataset.ground = top?.dataset.ground ?? 'light';
+      // inside the home stage all scenes overlap under the bar: the stage says which one is showing
+      const inStage = top?.closest('[data-stage]');
+      header.dataset.ground = (inStage && stageGround) || top?.dataset.ground || 'light';
     };
+    addEventListener('stage-scene', (e) => {
+      const d = (e as CustomEvent<{ ground: string; noHeader: boolean }>).detail;
+      stageGround = d.ground;
+      header.classList.toggle('hide-stage', d.noHeader);   // the full-screen video: no header at all
+      pick();
+    });
     const watch = () => {
       io?.disconnect(); under.clear();
       const y = Math.round(header.querySelector('.bar')!.getBoundingClientRect().top + 24);
@@ -293,7 +302,7 @@ const current = (href: string, panel?: boolean) =>
 
   .site-header { position: fixed; inset: 0 0 auto; z-index: 60; padding: 1rem 2.5rem 0; pointer-events: none; }
   .site-header { transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out), visibility 0s linear 0s; }
-  .site-header.away { opacity: 0; transform: translateY(-1.2rem); visibility: hidden; transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out), visibility 0s linear 400ms; }
+  .site-header.away, .site-header.hide-stage { opacity: 0; transform: translateY(-1.2rem); visibility: hidden; transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out), visibility 0s linear 400ms; }
   .bar {
     pointer-events: auto;
     max-width: 88rem; margin: 0 auto; height: 4.4rem; padding: 0 0.5rem 0 1.7rem; column-gap: 1.5rem;

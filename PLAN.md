@@ -376,6 +376,8 @@ Load `ui-ux-pro-max` for desktop and `mobile-native` for phone. Options only: Ca
 ## 7. Phase D · Home
 
 - [ ] **D1 · Structure**
+  - **Order (Cata, 25 Nov 2026):** Hero → Servicii (3 main + extra strip) → Vouchere → Video → Echipa → Recomandările noastre → Program și locație → footer.
+  - **Scroll:** a pinned stage (`src/scripts/motion/stage.ts`) with a different transition at each boundary; test board `/dev/d/`.
   - **Goal:** decide together:
     - the sections and their order;
     - which card enters from which side or corner;

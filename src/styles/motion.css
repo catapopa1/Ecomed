@@ -13,3 +13,16 @@ html.lenis, html.lenis body { height: auto; }
 
 /* Drawings */
 [data-draw] svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* Stage (D1 test): scenes become stacked full-screen layers in one pinned stage (stage.ts adds .stage-on) */
+.stage-on { position: relative; height: 100vh; height: 100svh; overflow: clip; perspective: 1800px; background: var(--color-navy-900); }
+/* no backdrop filters inside the stage: Chrome re-renders blur + refraction under every moving layer and it
+   flickers (the Vouchere/Video glitch). The glass keeps its rim and shadow; a white layer stands in for the lift */
+.stage-on .liquid { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.stage-on .section:not([data-ground='navy']) .liquid { background-image: linear-gradient(rgb(255 255 255 / 0.26), rgb(255 255 255 / 0.26)); }
+.stage-on > .scene > .rec-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: visible; }
+.stage-on > .scene > .rec-lines path { fill: none; stroke-width: 2; stroke-linecap: round; opacity: 0.85; filter: drop-shadow(0 0 6px currentColor); }
+.stage-on > .scene { position: absolute; inset: 0; overflow: hidden; will-change: transform; box-shadow: 0 2rem 5rem rgb(10 20 40 / 0.35); transform-origin: 50% 50%; }
+.stage-on > .scene > .section { min-height: 100vh; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; will-change: transform; }
+/* inside the stage a section is one screen: clear the fixed header on top, a little air at the bottom */
+.stage-on > .scene > .section:not(.hero) { padding-top: 6.6rem; padding-bottom: 2.4rem; }

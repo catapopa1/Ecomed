@@ -87,9 +87,11 @@ const tubeList = [
 
 <style>
   :global(.hero) { min-height: 100vh; min-height: 100svh; display: grid; align-content: center; }
+  /* the hero is exactly one screen on every desktop: the drawing is sized by the screen height too */
+  :global(.hero.section) { padding-top: 0; padding-bottom: 0; }
   .hero-grid {
     display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 2rem;
-    max-width: var(--container-page); margin: 0 auto; padding-top: 5rem;
+    max-width: var(--container-page); margin: 0 auto; padding: 6rem 0 1rem;
   }
 
   /* the copy is centred in its half (Cata) */
@@ -111,7 +113,7 @@ const tubeList = [
   .note { margin: 1.1rem 0 0; font-size: var(--text-small); color: var(--ctx-muted); }
 
   /* ── drawing ── */
-  .art { position: relative; width: 100%; aspect-ratio: 1;
+  .art { position: relative; width: min(100%, calc(100svh - 9rem)); justify-self: center; aspect-ratio: 1;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
   .art svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke-linecap: round; stroke-linejoin: round; }

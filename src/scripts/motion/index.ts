@@ -8,9 +8,11 @@ import { initSmooth, stopSmooth } from './smooth';
 import { buildReveals, killReveals } from './reveal';
 import { buildDeck, killDeck } from './deck';
 import { buildDraws, killDraws } from './draw';
+import { buildStage, killStage } from './stage';
+import { buildPaging, killPaging } from './paging';
 
 export function teardown() {
-  killReveals(); killDeck(); killDraws();
+  killReveals(); killDeck(); killDraws(); killStage(); killPaging();
 }
 
 export function build() {
@@ -19,11 +21,14 @@ export function build() {
   const q = new URLSearchParams(location.search);       // A5 lab switches: ?smooth=0, ?exit=0
   const smooth = q.get('smooth') !== '0';
   if (q.get('exit') === '0') document.querySelectorAll('[data-exit]').forEach((el) => el.removeAttribute('data-exit'));
-  if (smooth) initSmooth(); else stopSmooth();
+  // desktop: the wheel pages section by section (paging.ts, whole site); Lenis only smooths phones
+  if (smooth && isPhone()) initSmooth(); else stopSmooth();
   if (!isPhone()) buildDeck();
+  buildStage();
   buildReveals();
   buildDraws();
   ScrollTrigger.refresh();
+  buildPaging();
   document.documentElement.classList.add('motion-ready');
 }
 
