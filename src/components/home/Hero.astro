@@ -1,21 +1,24 @@
 ---
 /**
- * Home hero (B): copy (centred) on the left, the voucher-style line drawing on the right.
- * The drawing draws itself once on load (popa-insolventa method: pathLength="1" + a dash transition),
- * slowly and in order: the wave band and circles, the ECG pen line, the stethoscope (ear tubes draw the
- * heart, then the tube runs to the chest piece), the chest piece, the ripples, the glow and plus signs.
- * Then it rests and only breathes. No video here (Cata: the video goes lower on the page).
- * No JS / reduced motion: the drawing is simply there, complete. Geometry: src/data/heroArt.ts.
+ * Home hero: copy (centred) on the left, the drawing on the right.
+ * The drawing is the REAL voucher 16 art (M/desene/desen_voucher_16.png, the face), mirrored to look left.
+ * It "draws itself" once on load: every line was traced to a stroke at build time (scripts/hero-strokes.mjs
+ * → src/data/heroStrokes.json); each stroke is a thick line in an SVG mask that draws (dash transition) and
+ * uncovers the real art underneath: the band and circles first, then the face as one pen; a final fade
+ * fills in the soft glows. The art is served as exported (webp q95), not re-compressed.
+ * No JS / reduced motion: the drawing is simply there, complete.
  * Promo pill slot: none until there is a real promo (TODO (ask Cata)).
  */
 import Section from '../Section.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
 import { site } from '../../data/site';
-import { W, H, band, bandOrange, pulse, tubes, yoke, ears, chest, ripples, glow, pluses, circles } from '../../data/heroArt';
-const tubeList = [
-  { t: tubes.left, k: 'ear' }, { t: tubes.right, k: 'ear' }, { t: tubes.main, k: 'main' },
-];
+import strokes from '../../data/heroStrokes.json';
+import artBand from '../../assets/hero/hero-band.webp';
+import artFace from '../../assets/hero/hero-face.webp';
+
+const { w: W, h: H } = strokes;
+const st = (s: { delay: number; dur: number }) => `--d:${s.delay}s;--t:${s.dur}s`;
 ---
 <Section ground="light" seed={101} class="hero" aria-labelledby="hero-h1">
   <div class="hero-grid">
@@ -33,44 +36,17 @@ const tubeList = [
     <div class="art" id="hero-art" aria-hidden="true">
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
         <defs>
-          <radialGradient id="hero-glow"><stop offset="0" stop-color="var(--color-orange-200)" stop-opacity=".95" /><stop offset=".5" stop-color="var(--color-sky-300)" stop-opacity=".45" /><stop offset="1" stop-color="var(--color-sky-300)" stop-opacity="0" /></radialGradient>
+          <mask id="hero-m-band" maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+            <rect class="a-fill" width={W} height={H} fill="#fff" />
+            {strokes.band.map((s) => <path class:list={['a-d', { o: s.o }]} pathLength="1" d={s.d} style={st(s)} />)}
+          </mask>
+          <mask id="hero-m-face" maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+            <rect class="a-fill" width={W} height={H} fill="#fff" />
+            {strokes.face.map((s) => <path class:list={['a-d', { o: s.o }]} pathLength="1" d={s.d} style={st(s)} />)}
+          </mask>
         </defs>
-        <circle class="a-glow" cx={glow.cx} cy={glow.cy} r={glow.r} fill="url(#hero-glow)" />
-        <g class="a-circles">
-          {circles.map(([cx, cy, r, c], i) => (
-            <g style={`--i:${i}`}>
-              {c === 'o' && <circle class="a-d halo" pathLength="1" cx={cx} cy={cy} r={r} />}
-              <circle class:list={['a-d', c === 'o' ? 'o' : 's']} pathLength="1" cx={cx} cy={cy} r={r} />
-            </g>
-          ))}
-        </g>
-        <g class="a-band">
-          {band.map((d, i) => <path class="a-d" pathLength="1" d={d} style={`--i:${i}`} />)}
-          <path class="a-d halo wide" pathLength="1" d={bandOrange} />
-          <path class="a-d o wide" pathLength="1" d={bandOrange} />
-        </g>
-        <path class="a-d a-pulse" pathLength="1" d={pulse} />
-        <g class="a-steth">
-          {tubeList.map(({ t, k }) => (
-            <g class={k}>
-              <path class="a-d hi" pathLength="1" d={t.hi} />
-              <path class="a-d ln" pathLength="1" d={t.a} />
-              <path class="a-d ln" pathLength="1" d={t.b} />
-            </g>
-          ))}
-          <rect class="a-d ln yk" pathLength="1" x={yoke.x} y={yoke.y} width={yoke.w} height={yoke.h} rx="5" />
-          <g class="ears">{ears.map((d) => <path class="a-d ln" pathLength="1" d={d} />)}</g>
-          <g class="chest">
-            {chest.stem.map((d) => <path class="a-d ln" pathLength="1" d={d} />)}
-            {chest.rings.map((d, i) => <path class:list={['a-d', i === 1 ? 's' : 'ln']} pathLength="1" d={d} style={`--i:${i}`} />)}
-          </g>
-        </g>
-        <g class="a-rip">
-          {ripples.map((d, i) => (
-            <g style={`--i:${i}`}><path class="a-d halo" pathLength="1" d={d} /><path class="a-d o" pathLength="1" d={d} /></g>
-          ))}
-        </g>
-        <g class="a-plus">{pluses.map((d, i) => <path class:list={['a-d', i % 2 ? 's' : 'o']} pathLength="1" d={d} style={`--i:${i}`} />)}</g>
+        <image href={artBand.src} width={W} height={H} mask="url(#hero-m-band)" />
+        <image href={artFace.src} width={W} height={H} mask="url(#hero-m-face)" />
       </svg>
       {/* hide before first paint so the draw starts from nothing; skipped with reduced motion (and without JS) */}
       <script is:inline>
@@ -128,53 +104,26 @@ const tubeList = [
   .note { margin: 1.1rem 0 0; font-size: var(--text-small); color: var(--ctx-muted); }
 
   /* ── drawing ── */
-  .art { position: relative; width: min(100%, calc(100svh - 9rem)); justify-self: center; aspect-ratio: 1;
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
-  .art svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .art { position: relative; width: min(100%, calc((100svh - 8rem) * 0.842)); justify-self: center; aspect-ratio: 1179 / 1400;
+    /* soft edges on all four sides (the art's circles and band run off the drawing) */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent), linear-gradient(transparent, #000 7%, #000 93%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent), linear-gradient(transparent, #000 7%, #000 93%, transparent);
+    mask-composite: intersect; }
+  .art svg { position: absolute; inset: 0; width: 100%; height: 100%; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
 
-  .a-band .a-d { stroke: var(--color-sky-500); stroke-width: 0.7; opacity: 0.7; }
-  .a-band .a-d:nth-child(3n) { opacity: 0.4; }
-  .a-pulse { stroke: var(--color-navy); stroke-width: 2; stroke-linejoin: miter; stroke-miterlimit: 8; }
-  .a-steth .ln { stroke: var(--color-navy); stroke-width: 1.7; }
-  .a-steth .hi { stroke: var(--color-sky-500); stroke-width: 1; opacity: 0.8; }
-  .a-d.o { stroke: var(--color-orange); stroke-width: 2; }
-  .a-d.s { stroke: var(--color-sky-500); stroke-width: 1.6; }
-  .a-d.halo { stroke: var(--color-sky-300); stroke-width: 6; opacity: 0.6; }
-  .a-band .a-d.wide.o { stroke-width: 2.6; opacity: 1; }
-  .a-band .a-d.wide.halo { stroke-width: 7.5; opacity: 0.55; }
-  .a-plus .a-d { stroke-width: 2.2; }
+  /* mask strokes: white uncovers the art; wide enough for the line, wider for the orange rings' glow */
+  .a-d { fill: none; stroke: #fff; stroke-width: 15; stroke-dasharray: 1 1; stroke-dashoffset: 0; }
+  .a-d.o { stroke-width: 34; }
 
   /* draw-in: class selectors only (Chrome won't restyle SVG children matched by [pathLength]) */
-  .a-d { stroke-dasharray: 1 1; stroke-dashoffset: 0; }
-  .a-glow { transform-box: fill-box; transform-origin: center; }
   .art.pre .a-d { stroke-dashoffset: 1; transition: none; }
-  .art.pre .a-glow { opacity: 0; transform: scale(0.6); transition: none; }
-
-  .a-band .a-d { transition: stroke-dashoffset 2.8s var(--ease-draw) calc(0.1s + var(--i, 0) * 0.05s); }
-  .a-band .a-d.wide { transition-delay: 0.4s; transition-duration: 3s; }
-  .a-circles .a-d { transition: stroke-dashoffset 1.8s var(--ease-draw) calc(0.5s + var(--i) * 0.12s); }
-  .a-pulse { transition: stroke-dashoffset 3.2s var(--ease-draw) 0.7s; }
-  .a-steth .ear .a-d { transition: stroke-dashoffset 2.6s var(--ease-draw) 1.4s; }
-  .a-steth .ears .a-d { transition: stroke-dashoffset 0.7s var(--ease-draw) 1.2s; }
-  .a-steth .yk { transition: stroke-dashoffset 0.5s var(--ease-draw) 3.6s; }
-  .a-steth .main .a-d { transition: stroke-dashoffset 1.4s var(--ease-draw) 3.8s; }
-  .a-steth .chest .a-d { transition: stroke-dashoffset 1.1s var(--ease-draw) calc(4.9s + var(--i, 0) * 0.18s); }
-  .a-rip .a-d { transition: stroke-dashoffset 1s var(--ease-draw) calc(5.6s + var(--i) * 0.18s); }
-  .a-plus .a-d { transition: stroke-dashoffset 0.6s var(--ease-draw) calc(5.9s + var(--i) * 0.15s); }
-  .a-glow { transition: opacity 1.6s ease 3.6s, transform 1.6s var(--ease-drop) 3.6s; }
-
-  /* resting: the glow breathes, the ripples pulse outwards, the circles float */
-  .art.go .a-glow { animation: breathe 5s ease-in-out 5.4s infinite; }
-  .art.go .a-rip g { animation: ripple 3.6s ease-in-out calc(7s + var(--i) * 0.35s) infinite; }
-  .art.go .a-circles g { transform-box: view-box; animation: float 9s ease-in-out calc(var(--i) * -1.3s) infinite; }
-  @keyframes breathe { 50% { opacity: 0.7; transform: scale(1.08); } }
-  @keyframes ripple { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-  @keyframes float { 50% { transform: translate(0, -6px); } }
+  .art.pre .a-fill { opacity: 0; transition: none; }
+  .a-d { transition: stroke-dashoffset var(--t) var(--ease-draw) var(--d); }
+  .a-fill { transition: opacity 1.2s ease 6.4s; }
 
   @media (prefers-reduced-motion: reduce) {
-    .art .a-d, .a-glow { transition: none !important; }
-    .art .a-glow, .art .a-rip g, .art .a-circles g { animation: none !important; }
+    .art .a-d, .art .a-fill { transition: none !important; }
   }
 
   /* ── phone: copy on top, the drawing under it, all on one screen ── */
@@ -187,9 +136,6 @@ const tubeList = [
     .btns { flex-direction: column; align-self: stretch; gap: 0.55rem; margin-top: 1.2rem; }
     .btns :global(.btn) { width: 100%; min-height: max(48px, 3.2rem); }
     .note { display: none; }
-    .art { width: min(100%, 32svh); margin: 0.4rem auto 0; }
-    .a-pulse { stroke-width: 2.8; }
-    .a-steth .ln { stroke-width: 2.3; }
-    .a-band .a-d { stroke-width: 1; }
+    .art { width: min(100%, 30svh); margin: 0.4rem auto 0; }
   }
 </style>
