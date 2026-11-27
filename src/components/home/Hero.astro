@@ -2,10 +2,9 @@
 /**
  * Home hero: copy (centred) on the left, the drawing on the right.
  * The drawing is the REAL voucher 16 art (M/desene/desen_voucher_16.png, the face), mirrored to look left.
- * It "draws itself" once on load: every line was traced to a stroke at build time (scripts/hero-strokes.mjs
- * → src/data/heroStrokes.json); each stroke is a thick line in an SVG mask that draws (dash transition) and
- * uncovers the real art underneath: the band and circles first, then the face as one pen; a final fade
- * fills in the soft glows. The art is served as exported (webp q95), not re-compressed.
+ * The art was traced into true vector lines at build time (scripts/hero-strokes.mjs → src/data/heroStrokes.json),
+ * so it is crisp at any size. It "draws itself" once on load (dash transition per line): every line draws
+ * from its outer end inwards, started by a front closing in from the four corners into the middle.
  * No JS / reduced motion: the drawing is simply there, complete.
  * Promo pill slot: none until there is a real promo (TODO (ask Cata)).
  */
@@ -13,12 +12,11 @@ import Section from '../Section.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
 import { site } from '../../data/site';
-import strokes from '../../data/heroStrokes.json';
-import artBand from '../../assets/hero/hero-band.webp';
-import artFace from '../../assets/hero/hero-face.webp';
+import art from '../../data/heroStrokes.json';
 
-const { w: W, h: H } = strokes;
+const { w: W, h: H } = art;
 const st = (s: { delay: number; dur: number }) => `--d:${s.delay}s;--t:${s.dur}s`;
+const orange = art.paths.filter((p) => p.o);
 ---
 <Section ground="light" seed={101} class="hero" aria-labelledby="hero-h1">
   <div class="hero-grid">
@@ -36,17 +34,15 @@ const st = (s: { delay: number; dur: number }) => `--d:${s.delay}s;--t:${s.dur}s
     <div class="art" id="hero-art" aria-hidden="true">
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
         <defs>
-          <mask id="hero-m-band" maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
-            <rect class="a-fill" width={W} height={H} fill="#fff" />
-            {strokes.band.map((s) => <path class:list={['a-d', { o: s.o }]} pathLength="1" d={s.d} style={st(s)} />)}
-          </mask>
-          <mask id="hero-m-face" maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
-            <rect class="a-fill" width={W} height={H} fill="#fff" />
-            {strokes.face.map((s) => <path class:list={['a-d', { o: s.o }]} pathLength="1" d={s.d} style={st(s)} />)}
-          </mask>
+          <filter id="hero-glow" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="3.2" /></filter>
         </defs>
-        <image href={artBand.src} width={W} height={H} mask="url(#hero-m-band)" />
-        <image href={artFace.src} width={W} height={H} mask="url(#hero-m-face)" />
+        {/* the orange lines' soft glow: blurred copies that draw along with them */}
+        <g class="glow" filter="url(#hero-glow)">
+          {orange.map((p) => <path class="a-d" pathLength="1" d={p.d} stroke={p.col} stroke-width={p.w * 1.8} style={st(p)} />)}
+        </g>
+        <g>
+          {art.paths.map((p) => <path class="a-d" pathLength="1" d={p.d} stroke={p.col} stroke-width={p.w} style={st(p)} />)}
+        </g>
       </svg>
       {/* hide before first paint so the draw starts from nothing; skipped with reduced motion (and without JS) */}
       <script is:inline>
@@ -105,25 +101,24 @@ const st = (s: { delay: number; dur: number }) => `--d:${s.delay}s;--t:${s.dur}s
 
   /* ── drawing ── */
   .art { position: relative; width: min(100%, calc((100svh - 8rem) * 0.842)); justify-self: center; aspect-ratio: 1179 / 1400;
-    /* soft edges on all four sides (the art's circles and band run off the drawing) */
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent), linear-gradient(transparent, #000 7%, #000 93%, transparent);
+    /* only a thin soft edge where the art's circles and band run off the drawing, so all of it shows */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent), linear-gradient(transparent, #000 2.5%, #000 97.5%, transparent);
     -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent), linear-gradient(transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent), linear-gradient(transparent, #000 2.5%, #000 97.5%, transparent);
     mask-composite: intersect; }
   .art svg { position: absolute; inset: 0; width: 100%; height: 100%; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
 
-  /* mask strokes: white uncovers the art; wide enough for the line, wider for the orange rings' glow */
-  .a-d { fill: none; stroke: #fff; stroke-width: 15; stroke-dasharray: 1 1; stroke-dashoffset: 0; }
-  .a-d.o { stroke-width: 34; }
+  /* the lines themselves (colour and width per line come from the art) */
+  .a-d { fill: none; stroke-dasharray: 1 2; stroke-dashoffset: 0; }
+  .glow { opacity: 0.3; }
 
-  /* draw-in: class selectors only (Chrome won't restyle SVG children matched by [pathLength]) */
-  .art.pre .a-d { stroke-dashoffset: 1; transition: none; }
-  .art.pre .a-fill { opacity: 0; transition: none; }
+  /* draw-in: class selectors only (Chrome won't restyle SVG children matched by [pathLength]).
+     The hidden offset sits just past 1 so a round cap can't leave a dot at a line's start. */
+  .art.pre .a-d { stroke-dashoffset: 1.02; transition: none; }
   .a-d { transition: stroke-dashoffset var(--t) var(--ease-draw) var(--d); }
-  .a-fill { transition: opacity 1.2s ease 6.4s; }
 
   @media (prefers-reduced-motion: reduce) {
-    .art .a-d, .art .a-fill { transition: none !important; }
+    .art .a-d { transition: none !important; }
   }
 
   /* ── phone: copy on top, the drawing under it, all on one screen ── */

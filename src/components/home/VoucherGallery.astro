@@ -1,8 +1,8 @@
 ---
 /**
  * Voucher gallery: the 7 groups as a horizontal accordion (the 21st.dev "Elastic Gallery" pattern Cata
- * picked: the active card opens wide, the others fold into narrow strips). Each card is the group's
- * first REAL voucher front (M/vouchere → src/assets/vouchere). Hover, focus or tap opens a card; on an
+ * picked: the active card opens wide, the others fold into narrow strips). Each card is the group's own
+ * design (M/vouchere_grupe → src/assets/grupe/grupa-<id>.jpg). Hover, focus or tap opens a card; on an
  * open card the click goes to the group page. Under it: the open group's title, hook and links.
  * No JS: every card is a plain link and the first one is open.
  */
@@ -11,13 +11,13 @@ import type { ImageMetadata } from 'astro';
 import Button from '../ui/Button.astro';
 import { GROUPS, vouchersIn } from '../../data/vouchers';
 
-const files = import.meta.glob<{ default: ImageMetadata }>('../../assets/vouchere/*-fata.jpg', { eager: true });
-const front = (id: string) => files[`../../assets/vouchere/voucher-${id.toLowerCase().replace('.', '-')}-fata.jpg`]?.default;
+const files = import.meta.glob<{ default: ImageMetadata }>('../../assets/grupe/grupa-*.jpg', { eager: true });
+const front = (id: string) => files[`../../assets/grupe/grupa-${id}.jpg`]?.default;
 
 const items = GROUPS.map((g) => {
   const list = vouchersIn(g.id);
   const v = list[0];
-  return { g, v, n: list.length, img: v ? front(v.id) : undefined };
+  return { g, v, n: list.length, img: front(g.id) };
 });
 const plural = (n: number) => (n === 1 ? '1 voucher' : `${n} vouchere`);
 ---
@@ -26,7 +26,7 @@ const plural = (n: number) => (n === 1 ? '1 voucher' : `${n} vouchere`);
     {items.map(({ g, v, n, img }, i) => (
       <li class:list={['eg-item', { on: i === 0 }]} data-i={i} data-title={g.title} data-hook={g.hook} data-href={g.slug} data-count={plural(n)}>
         <a href={g.slug} aria-label={`${g.title}: ${plural(n)}`}>
-          {img && <Image src={img} alt={v ? `Voucher ${v.line}: ${v.title}, ${v.subtitle}` : ''} widths={[480, 900, 1400]} sizes="(max-width: 820px) 90vw, 46rem" loading={i < 2 ? 'eager' : 'lazy'} />}
+          {img && <Image src={img} alt={`Voucher ${v?.line ?? ''}: ${g.title}. ${g.hook}`} widths={[480, 900, 1400]} sizes="(max-width: 820px) 90vw, 46rem" loading={i < 2 ? 'eager' : 'lazy'} />}
           <span class="eg-veil" aria-hidden="true"></span>
           <span class="eg-label" aria-hidden="true"><span>{g.title}</span><b>{g.order}</b></span>
         </a>
