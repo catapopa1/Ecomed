@@ -551,7 +551,7 @@ One `Seo` component renders a single `@graph` per page. Entities with fixed `@id
     "streetAddress": "Str. Nicolae Jiga nr. 9, ap. 3",
     "addressLocality": "Oradea",
     "addressRegion": "Bihor",
-    "postalCode": "TODO (ask Cata)",
+    "postalCode": "410028",
     "addressCountry": "RO"
   },
   "geo": { "@type": "GeoCoordinates", "latitude": "TODO", "longitude": "TODO" },
@@ -577,7 +577,7 @@ One `Seo` component renders a single `@graph` per page. Entities with fixed `@id
 | Name | Clinica Ecomed - Dr. Alina Teușdea |
 | Street | Str. Nicolae Jiga nr. 9, ap. 3 |
 | City | Oradea, jud. Bihor |
-| Postal code | TODO (ask Cata) |
+| Postal code | 410028 |
 | Phone (display) | 0785 234 432 |
 | Phone (link / schema) | +40785234432 |
 | Email | cmgenmed@yahoo.com |

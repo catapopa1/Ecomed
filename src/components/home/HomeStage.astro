@@ -1,10 +1,10 @@
 ---
 /**
- * D1 test board (/dev/d/): the home order Cata set on 25 Nov 2026, as section outlines, inside the
- * stage, with a different scroll transition at every boundary so he can pick per boundary.
- * Order: Hero → Servicii → Vouchere → Video → Echipa → Recomandări → Program și locație.
- * Copy here is only what FACTS already says; headings are drafts (D4 writes the copy).
- * Photos, voucher fronts and the video are placeholders (T2, T10; media stays outside the repo for now).
+ * The home page body (index.astro, also previewed at /dev/d/): every section inside the pinned stage,
+ * with a different scroll transition at each boundary (stage.ts), paged one gesture = one section.
+ * Order (Cata, 25 Nov 2026; video dropped from home 27 Nov, it goes to the voucher pages): Hero → Servicii →
+ * Vouchere → Echipa → Recomandări → Program și locație.
+ * Copy is only what FACTS already says; headings are drafts (D4 writes the copy; the Servicii intro waits for it).
  */
 import Section from '../Section.astro';
 import Hero from '../home/Hero.astro';
@@ -23,7 +23,7 @@ const services = [
 /* one colour per recommendation (brand sky / orange / peach tones; no mauve outside gradients) */
 const recColors = ['#5E93D6', '#F5A02A', '#FF8F70', '#7FB8E8', '#FFC861'];
 const extra = ['Ecografie', 'EKG', 'Holter TA', 'Osteodensitometrie'];
-/* photos: M/staff, unretouched (T10: staff consent for the website still to confirm before going live).
+/* photos: M/staff, unretouched (staff consent confirmed by Cata, 27 Nov 2026).
    One colour per person; `pos`/`zoom` frame the face (Dr. Baiduca's photo is a wide desk shot). */
 import pTeusdea from '../../assets/staff/dr-teusdea-alina.jpg';
 import pBaiduca from '../../assets/staff/dr-baiduca-alexandru-echipa.jpg';   // standing, cropped from the team photo (Cata)
@@ -43,15 +43,13 @@ const quotes = [
   'Nu știți dacă aveți nevoie de specialist sau de analize? Începeți cu medicul de familie.',
 ];
 ---
-<div class="tx-legend liquid" aria-hidden="true">D1 · tranziții: zoom-slide → cerc → portal → jaluzele → cub → diagonală</div>
-
 <div data-stage>
   <div class="scene"><Hero /></div>
 
   <!-- 1 → 2: zoom out, slide sideways, zoom in (Cata's idea) -->
   <div class="scene" data-tx="zoomslide">
     <Section ground="navy" seed={202} aria-labelledby="h-serv">
-      <SectionHead eyebrow="Servicii" title="Cele trei servicii ale clinicii" size="h1"><p>(text în pasul D4)</p></SectionHead>
+      <SectionHead eyebrow="Servicii" title="Cele trei servicii ale clinicii" size="h1" />
       <div class="svc">
         {services.map((s) => (
           <a class="svc-card liquid" href={s.href} style={`--c:${s.c}`}>
@@ -72,16 +70,7 @@ const quotes = [
     </Section>
   </div>
 
-  <!-- 3 → 4: a window opens in the middle and we fly through it -->
-  <div class="scene" data-tx="portal" data-no-header>
-    <Section ground="navy" seed={204} class="video-sec">
-      <div class="video">
-        <div class="video-frame"><span>Video (T2: care video?)</span></div>
-      </div>
-    </Section>
-  </div>
-
-  <!-- 4 → 5: vertical blinds -->
+  <!-- 3 → 4: vertical blinds -->
   <div class="scene" data-tx="blinds">
     <Section ground="light" seed={205}>
       <SectionHead eyebrow="Echipa noastră" title="Medici și terapeuți specializați" />
@@ -99,7 +88,7 @@ const quotes = [
     </Section>
   </div>
 
-  <!-- 5 → 6: the stage turns like a cube; the quotes then step through -->
+  <!-- 4 → 5: the stage turns like a cube; the quotes then step through -->
   <div class="scene" data-tx="cube">
     <Section ground="navy" seed={206}>
       <SectionHead eyebrow="Recomandările noastre" title="Pe scurt, de la medicul de familie" />
@@ -117,7 +106,7 @@ const quotes = [
     </Section>
   </div>
 
-  <!-- 6 → 7: a diagonal wipe sweeps across -->
+  <!-- 5 → 6: a diagonal wipe sweeps across -->
   <div class="scene" data-tx="diagonal">
     <Section ground="peach" seed={207}>
       <SectionHead eyebrow="Program și locație" title="Vă așteptăm la clinică" />
@@ -155,11 +144,10 @@ const quotes = [
 </script>
 
 <style>
-  .tx-legend { position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%); z-index: 90; padding: 0.4rem 0.9rem; border-radius: 99px; font-size: 0.8rem; color: var(--color-navy-900); --lg-fill: rgb(255 255 255 / 0.7); }
   .center { display: flex; justify-content: center; margin-top: 1.8rem; }
   .btns { gap: 0.8rem; flex-wrap: wrap; }
   h3 { margin: 0; font-size: var(--text-h3, 1.4rem); font-weight: 600; }
-  .svc, .team, .visit, .rec, .hview, .video { max-width: var(--container-page); margin: 1.8rem auto 0; }
+  .svc, .team, .visit, .rec, .hview { max-width: var(--container-page); margin: 1.8rem auto 0; }
 
   .svc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; margin-top: 2.4rem; }
   .svc-card {
@@ -184,10 +172,6 @@ const quotes = [
   .vg-front { aspect-ratio: 3 / 2; border-radius: 1rem; display: grid; place-items: center; font-size: 0.85rem; color: var(--ctx-muted); background: rgb(255 255 255 / 0.45); border: 1px dashed rgb(22 36 61 / 0.3); }
   .vg-n { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; }
 
-  /* the video fills the whole screen; the header hides over it (Cata) */
-  :global(.video-sec.section) { padding: 0 !important; }
-  .video { max-width: none; margin: 0; }
-  .video-frame { width: 100%; height: 100vh; height: 100svh; display: grid; place-items: center; background: linear-gradient(135deg, #2A4774, #5A4C7E); color: var(--color-sky-300); }
 
   .team { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
   /* each person has a colour: tinted card, coloured rim, a short bar under the name; text centred */

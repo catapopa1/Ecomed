@@ -8,7 +8,7 @@ export const site = {
   email: 'cmgenmed@yahoo.com',            // forms send here
   street: 'Str. Nicolae Jiga nr. 9, ap. 3',
   city: 'Oradea, jud. Bihor',
-  postalCode: '',                         // TODO (ask Cata) · T5
+  postalCode: '410028',                   // Str. Nicolae Jiga odd 1–33 (bancibancomate.ro)
   mapsHref: 'https://www.google.com/maps/search/?api=1&query=Str.+Nicolae+Jiga+9,+Oradea',
   hours: [
     { days: 'Luni, Miercuri, Vineri', time: '08:30–13:30' },

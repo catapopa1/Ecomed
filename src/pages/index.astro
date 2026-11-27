@@ -1,14 +1,15 @@
 ---
-import '../styles/global.css';
+/**
+ * Home (/). Title, meta and schema from SEO.md §4.1 / §7: WebSite + MedicalClinic + WebPage.
+ * The body is the stage of home sections (components/home/HomeStage.astro).
+ */
+import Base from '../layouts/Base.astro';
+import HomeStage from '../components/home/HomeStage.astro';
+import { website, clinic, webPage } from '../data/schema';
+
+const title = 'Medic de familie Oradea | Clinica Ecomed - Dr. Alina Teușdea';
+const description = 'Clinica Ecomed - Dr. Alina Teușdea, Oradea: medic de familie pentru adulți și copii, kinetoterapie, recuperare medicală și terapii beauty. 0785 234 432';
 ---
-<!doctype html>
-<html lang="ro">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Astro</title>
-  </head>
-  <body>
-    <h1>Astro</h1>
-  </body>
-</html>
+<Base title={title} description={description} schema={[website, clinic, webPage('/', title, description)]}>
+  <HomeStage />
+</Base>

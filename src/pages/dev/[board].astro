@@ -8,18 +8,20 @@ import BoardA3 from '../../components/dev/BoardA3.astro';
 import BoardA4 from '../../components/dev/BoardA4.astro';
 import BoardA5 from '../../components/dev/BoardA5.astro';
 import BoardC from '../../components/dev/BoardC.astro';
-import BoardD from '../../components/dev/BoardD.astro';
+import HomeStage from '../../components/home/HomeStage.astro';
+import OgCard from '../../components/dev/OgCard.astro';
 import Hero from '../../components/home/Hero.astro';
 import Section from '../../components/Section.astro';
 import Base from '../../layouts/Base.astro';
 import GlassDefs from '../../components/ui/GlassDefs.astro';
 
 export function getStaticPaths() {
-  return import.meta.env.DEV ? ['a3', 'a4', 'a5', 'c', 'b', 'd'].map(board => ({ params: { board } })) : [];
+  return import.meta.env.DEV ? ['a3', 'a4', 'a5', 'c', 'b', 'd', 'og'].map(board => ({ params: { board } })) : [];
 }
 const { board } = Astro.params;
 ---
-{board === 'd' ? <Base title="D · Home (dev)" noindex><BoardD /></Base> :
+{board === 'og' ? <html lang="ro"><head><meta charset="utf-8" /><meta name="robots" content="noindex" /><title>OG</title></head><body><OgCard /></body></html> :
+ board === 'd' ? <Base title="D · Home (dev)" noindex><HomeStage /></Base> :
  board === 'b' ? <Base title="B · Hero (dev)" noindex><Hero /><Section ground="navy" seed={102} class="tall"><p style="text-align:center">(restul paginii vine în pasul D)</p></Section></Base> :
  board === 'c' ? <Base title="C · Ecomed (dev)" noindex><BoardC /></Base> : (
 <html lang="ro">

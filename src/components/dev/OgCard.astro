@@ -1,0 +1,37 @@
+---
+/**
+ * Share image (Open Graph, 1200×630) for the home page: the hero face art on light blue + the clinic name.
+ * Rendered at /dev/og/ and screenshotted to public/og/home.png by scripts/og-image.sh (dev only).
+ */
+import art from '../../data/heroStrokes.json';
+const { w: W, h: H } = art;
+const orange = art.paths.filter((p) => p.o);
+---
+<div class="og">
+  <div class="txt">
+    <p class="brand">Dr. Alina Teușdea <span>by Ecomed</span></p>
+    <p class="h">Medic de familie și recuperare medicală <em>în Oradea</em></p>
+    <p class="tel">0785 234 432</p>
+  </div>
+  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <defs><filter id="og-glow" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="3.2" /></filter></defs>
+    <g filter="url(#og-glow)" opacity="0.3">{orange.map((p) => <path d={p.d} stroke={p.col} stroke-width={p.w * 1.8} />)}</g>
+    <g>{art.paths.map((p) => <path d={p.d} stroke={p.col} stroke-width={p.w} />)}</g>
+  </svg>
+</div>
+<style>
+  :global(html), :global(body) { margin: 0; background: #E8F1FA; }
+  :global(astro-dev-toolbar) { display: none !important; }
+  .og { position: relative; width: 1200px; height: 630px; overflow: hidden; display: grid; grid-template-columns: 1fr 520px; align-items: center;
+    background: radial-gradient(60% 80% at 78% 50%, #FFFFFF 0%, transparent 70%), linear-gradient(135deg, #D3E5F7 0%, #E8F1FA 55%, #C9DEF4 100%);
+    font-family: var(--font-sans, Rubik, sans-serif); color: #16243D; }
+  .txt { padding: 0 0 0 72px; }
+  .brand { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand span { font-size: 18px; font-weight: 600; color: #3A70B8; margin-left: 4px; }
+  .h { margin: 26px 0 0; font-size: 58px; line-height: 1.08; font-weight: 700; letter-spacing: -0.02em; max-width: 560px; }
+  .h em { font-style: normal; color: #3A70B8; }
+  .tel { display: inline-block; margin: 34px 0 0; padding: 14px 28px; border-radius: 999px; background: #FD9E01; font-size: 26px; font-weight: 700;
+    box-shadow: 0 12px 28px -14px rgb(253 158 1 / 0.9); }
+  svg { width: 520px; height: 618px; margin-top: 12px; stroke-linecap: round; stroke-linejoin: round; }
+  svg path { fill: none; }
+</style>

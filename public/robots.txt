@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://medicinadefamilieoradea.ro/sitemap-index.xml
